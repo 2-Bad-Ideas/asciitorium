@@ -46,6 +46,10 @@
     "test:ui": "vitest --ui",
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage",
+    "docs:api": "typedoc",
+    "docs:dev": "npm run docs:api && vitepress dev docs",
+    "docs:build": "npm run docs:api && vitepress build docs",
+    "docs:preview": "vitepress preview docs",
     "prepublishOnly": "npm run build"
   },
   "author": "Iroknee <tiroknee@gmail.com>",
@@ -77,8 +81,11 @@
     "fs-extra": "^11.3.0",
     "prettier": "^3.6.2",
     "tsx": "^4.20.3",
+    "typedoc": "^0.28.15",
+    "typedoc-plugin-markdown": "^4.9.0",
     "typescript": "^5.8.3",
     "vite": "^7.0.3",
+    "vitepress": "^1.6.4",
     "vitest": "^2.1.5"
   }
 }

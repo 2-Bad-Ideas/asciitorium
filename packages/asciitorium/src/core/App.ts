@@ -10,26 +10,91 @@ import {
 } from './environment.js';
 import { createSizeContext } from './utils/sizeUtils.js';
 
+/**
+ * Configuration options for the App component.
+ *
+ * Extends ComponentProps with app-specific properties.
+ */
 export interface AppProps extends ComponentProps {
-  // App-specific props can be added here
+  /** Font name for ASCII art text rendering (e.g., 'Standard', 'Doom') */
   font?: string;
 }
 
+/**
+ * Root application component for asciitorium.
+ *
+ * The App class is the entry point for all asciitorium applications. It handles:
+ * - **Renderer Selection**: Automatically detects environment (web/CLI) and initializes appropriate renderer
+ * - **Focus Management**: Manages keyboard navigation between focusable components
+ * - **Performance Monitoring**: Tracks FPS, CPU, and memory usage
+ * - **Keyboard Handling**: Sets up global keyboard event handling
+ * - **Resize Handling**: Responds to terminal/window resize events
+ * - **Keybind Registry**: Manages global keyboard shortcuts
+ *
+ * The App automatically sizes itself to the screen if no dimensions are provided,
+ * and uses a column layout by default.
+ *
+ * @example
+ * Basic web application:
+ * ```tsx
+ * import { App, Button } from 'asciitorium';
+ *
+ * const app = (
+ *   <App>
+ *     <Button onClick={() => console.log('Clicked!')}>
+ *       Click Me
+ *     </Button>
+ *   </App>
+ * );
+ * ```
+ *
+ * @example
+ * CLI application with custom size:
+ * ```tsx
+ * const app = (
+ *   <App width={80} height={24} layout="column">
+ *     <Text>Content</Text>
+ *   </App>
+ * );
+ * ```
+ */
 export class App extends Component {
-  readonly isApp = true; // Reliable identifier for App class
+  /** Reliable identifier for App class */
+  readonly isApp = true;
+  /** Focus manager for keyboard navigation */
   readonly focus: FocusManager;
+  /** Renderer instance (DOMRenderer for web, TTYRenderer for CLI) */
   private readonly renderer: Renderer;
+  /** FPS counter for current second */
   private fpsCounter: number = 0;
+  /** Total render time for current second (ms) */
   private totalRenderTime: number = 0;
+  /** Current frames per second */
   private currentFPS: number = 0;
+  /** Current CPU usage percentage */
   private currentCPU: number = 0;
+  /** Current memory usage in MB */
   private currentMemory: number = 0;
+  /** Last CPU usage measurement for delta calculation */
   private lastCPUUsage?: any;
+  /** Registry for global keyboard shortcuts */
   private keybindRegistry = new Map<string, any>();
+  /** Registry for mobile controller components */
   private mobileControllerRegistry: any[] = [];
+  /** Whether width was explicitly fixed by user */
   private readonly fixedWidth: boolean;
+  /** Whether height was explicitly fixed by user */
   private readonly fixedHeight: boolean;
 
+  /**
+   * Creates a new App instance.
+   *
+   * Automatically detects the environment (web vs CLI) and initializes the
+   * appropriate renderer. Sets up keyboard handling, focus management, and
+   * performance monitoring.
+   *
+   * @param props - App configuration options
+   */
   constructor(props: AppProps) {
     // Extract font from props or style object
     const fontFromStyle = props.style?.font;
@@ -93,6 +158,16 @@ export class App extends Component {
     this.registerCleanup(() => clearInterval(fpsIntervalId));
   }
 
+  /**
+   * Renders the application to the screen.
+   *
+   * Traverses the component tree, renders each component to buffers, and
+   * composites them based on z-index. Updates performance metrics and
+   * increments the FPS counter.
+   *
+   * This method is called automatically on initialization and whenever
+   * components request a re-render via the RenderScheduler.
+   */
   render(): void {
     const start =
       typeof performance !== 'undefined' && performance.now

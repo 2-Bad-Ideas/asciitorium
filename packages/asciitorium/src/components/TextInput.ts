@@ -31,6 +31,8 @@ export class TextInput extends Component {
 
   private cursorIndex = 0;
   private suppressCursorSync = false;
+  private cursorVisible = true;
+  private blinkInterval?: NodeJS.Timeout;
 
   focusable = true;
 
@@ -161,10 +163,44 @@ export class TextInput extends Component {
     return false;
   }
 
+  private startCursorBlink(): void {
+    // Only start blinking if not already active
+    if (this.blinkInterval) return;
+
+    this.cursorVisible = true;
+    this.blinkInterval = setInterval(() => {
+      this.cursorVisible = !this.cursorVisible;
+      requestRender();
+    }, 500); // Blink every 500ms
+  }
+
+  private stopCursorBlink(): void {
+    if (this.blinkInterval) {
+      clearInterval(this.blinkInterval);
+      this.blinkInterval = undefined;
+    }
+    this.cursorVisible = true;
+  }
+
+  private resetCursorBlink(): void {
+    this.stopCursorBlink();
+    this.startCursorBlink();
+  }
+
+  override destroy(): void {
+    this.stopCursorBlink();
+    super.destroy();
+  }
+
   override handleEvent(event: string): boolean {
     // Enable capture mode on first interaction when focused
     if (this.hasFocus && !this.captureModeActive && event !== 'Escape') {
       this.captureModeActive = true;
+    }
+
+    // Reset cursor blink timer on any keypress
+    if (this.hasFocus) {
+      this.resetCursorBlink();
     }
 
     let updated = false;
@@ -236,6 +272,13 @@ export class TextInput extends Component {
       this.initialHeightCalculated = true;
     }
 
+    // Manage cursor blinking based on focus state
+    if (this.hasFocus && !this.blinkInterval) {
+      this.startCursorBlink();
+    } else if (!this.hasFocus && this.blinkInterval) {
+      this.stopCursorBlink();
+    }
+
     const buffer = super.draw();
 
     const prefix = this.hasFocus ? ' > ' : ' > ';
@@ -274,12 +317,12 @@ export class TextInput extends Component {
       }
     }
 
-    // cursor
-    if (this.hasFocus && usableWidth > 0) {
+    // cursor - only show when focused and visible (for blinking effect)
+    if (this.hasFocus && this.cursorVisible && usableWidth > 0) {
       const { line: cursorLine, pos: cursorPos } = this.getCursorPosition(lines);
       const y = startY + cursorLine;
       const x = (cursorLine === 0 ? startX + prefixLength : startX) + cursorPos;
-      
+
       if (y < buffer.length && x < buffer[y].length) {
         buffer[y][x] = '▉';
       }

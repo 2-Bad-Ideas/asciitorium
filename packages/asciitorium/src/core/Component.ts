@@ -120,19 +120,67 @@ function mergeStyles(props: ComponentProps): ComponentStyle {
  * Abstract base class for all UI components in the asciitorium framework.
  *
  * Provides core functionality including:
- * - Position and size management with support for absolute and relative sizing
- * - Child component management with automatic layout calculation
- * - Focus handling with visual indicators (single/double-line borders)
- * - State binding and reactive updates
- * - ASCII-based rendering with transparency support
- * - Dynamic content switching for runtime component replacement
+ * - **Position and size management**: Supports absolute sizing, percentages, 'auto', and 'fill'
+ * - **Child component management**: Automatic layout calculation via Row/Column layouts
+ * - **Focus handling**: Visual indicators and keyboard navigation support
+ * - **State binding**: Reactive updates when bound state changes
+ * - **ASCII-based rendering**: Character-based 2D buffers with transparency
+ * - **Dynamic content switching**: Runtime component replacement based on state
+ *
+ * ## Rendering System
  *
  * Components use a character-based rendering system where each component
  * renders to a 2D string array buffer. The transparent character '‽' allows
  * for overlay effects and complex compositions.
  *
+ * ## Focus System
+ *
  * Focus-enabled components automatically switch between single-line borders
  * (╭╮╰╯─│) and double-line borders (╔╗╚╝═║) when focused.
+ *
+ * ## Layout System
+ *
+ * Components can be positioned in two ways:
+ * 1. **Relative positioning**: Using Row/Column layouts (default)
+ * 2. **Absolute positioning**: Using the `position` prop with x/y/z coordinates
+ *
+ * @example
+ * Creating a custom component:
+ * ```typescript
+ * class MyComponent extends Component {
+ *   constructor(options: ComponentProps) {
+ *     super({
+ *       ...options,
+ *       width: options.width ?? 20,
+ *       height: options.height ?? 10,
+ *       border: true
+ *     });
+ *   }
+ *
+ *   override draw(): string[][] {
+ *     // Custom rendering logic
+ *     this.buffer = Array.from({ length: this.height }, () =>
+ *       Array.from({ length: this.width }, () => ' ')
+ *     );
+ *     return this.buffer;
+ *   }
+ * }
+ * ```
+ *
+ * @example
+ * Using component props with JSX:
+ * ```tsx
+ * <Button
+ *   width="50%"
+ *   height={5}
+ *   border
+ *   align="center"
+ *   position={{ x: 10, y: 5, z: 100 }}
+ *   gap={{ x: 2, y: 1 }}
+ * >
+ *   Click Me
+ * </Button>
+ * ```
  */
 export abstract class Component {
   // ========================================================================
@@ -391,14 +439,14 @@ export abstract class Component {
       this.layout = LayoutRegistry.create(this.layoutType, this.layoutOptions);
     }
     this.layout.layout(this, this.children);
-    
+
     // After layout, recalculate auto-sizing if needed
     this.recalculateAutoSize();
   }
 
   protected recalculateAutoSize(): void {
     let sizeChanged = false;
-    
+
     // Recalculate width if it should be auto-sized
     if (this.originalWidth === undefined && this.children.length > 0) {
       const autoWidth = Component.calculateAutoWidth(this.children, this.layoutType);
@@ -409,7 +457,7 @@ export abstract class Component {
         sizeChanged = true;
       }
     }
-    
+
     // Recalculate height if it should be auto-sized
     if (this.originalHeight === undefined && this.children.length > 0) {
       const autoHeight = Component.calculateAutoHeight(this.children, this.layoutType);

@@ -1,20 +1,81 @@
 import { Component, ComponentProps } from '../core/Component.js';
 import { requestRender } from '../core/RenderScheduler.js';
 
+/**
+ * Configuration options for the Button component.
+ *
+ * Extends ComponentProps with button-specific properties like content and click handlers.
+ */
 export interface ButtonOptions extends Omit<ComponentProps, 'children'> {
+  /** Text content to display on the button */
   content?: string;
+  /** Callback function invoked when the button is clicked */
   onClick?: () => void;
+  /** Child content (for JSX compatibility) */
   children?: string | string[];
 }
 
+/**
+ * Interactive button component with visual feedback.
+ *
+ * Features:
+ * - Press animation with shadow effects
+ * - Focus indicators (> and < brackets)
+ * - Keyboard activation (Enter or Space)
+ * - Hotkey support with visual indicators
+ * - Automatic sizing based on content
+ *
+ * The button uses a 3D shadow effect that shifts when pressed to provide
+ * tactile feedback. Focus state is indicated by brackets around the content.
+ *
+ * @example
+ * Basic button with click handler:
+ * ```typescript
+ * const button = new Button({
+ *   content: 'Click Me',
+ *   onClick: () => console.log('Clicked!'),
+ *   width: 20,
+ *   height: 4
+ * });
+ * ```
+ *
+ * @example
+ * Button with hotkey:
+ * ```typescript
+ * const button = new Button({
+ *   content: 'Save',
+ *   hotkey: 's',
+ *   onClick: () => saveFile()
+ * });
+ * ```
+ *
+ * @example
+ * Using JSX:
+ * ```tsx
+ * <Button onClick={() => alert('Hello')}>
+ *   Click Me
+ * </Button>
+ * ```
+ */
 export class Button extends Component {
+  /** Public click handler that includes press animation */
   public readonly onClick?: () => void;
+  /** Private click handler from options */
   private privateOnClick?: () => void;
+  /** Whether the button can receive focus */
   focusable = true;
+  /** Whether the button currently has focus */
   hasFocus = false;
+  /** Whether the button is currently in pressed state */
   private isPressed = false;
+  /** Timer for press animation duration */
   private pressTimer?: NodeJS.Timeout;
 
+  /**
+   * Creates a new Button instance.
+   *
+   * @param options - Button configuration options including content and click handler
+   */
   constructor({ onClick, ...options }: ButtonOptions) {
     // Support both new content prop and JSX children
     let actualContent = options.content || options.label; // fallback to label for backward compatibility
@@ -46,6 +107,14 @@ export class Button extends Component {
     };
   }
 
+  /**
+   * Triggers the press animation.
+   *
+   * Sets the button to pressed state for 100ms, shifting the shadow effect
+   * to provide visual feedback. Automatically returns to normal state after the animation.
+   *
+   * @private
+   */
   private press(): void {
     // Clear any existing timer
     if (this.pressTimer) {
@@ -68,6 +137,14 @@ export class Button extends Component {
     }, 100);
   }
 
+  /**
+   * Handles keyboard events for the button.
+   *
+   * Activates the button when Enter or Space is pressed.
+   *
+   * @param event - The keyboard event string (e.g., 'Enter', ' ')
+   * @returns `true` if the event was handled, `false` otherwise
+   */
   handleEvent(event: string): boolean {
     if (event === 'Enter' || event === ' ') {
       this.press();
@@ -76,6 +153,19 @@ export class Button extends Component {
     }
     return false;
   }
+
+  /**
+   * Renders the button to a 2D character buffer.
+   *
+   * Draws the button with:
+   * - 3D shadow effect (position shifts based on press state)
+   * - Border with rounded corners
+   * - Centered text content
+   * - Focus indicators (> and < brackets)
+   * - Hotkey label (when hotkey visibility is enabled)
+   *
+   * @returns 2D array of characters representing the button
+   */
   override draw(): string[][] {
     // Create buffer filled with transparent chars
     this.buffer = Array.from({ length: this.height }, () =>

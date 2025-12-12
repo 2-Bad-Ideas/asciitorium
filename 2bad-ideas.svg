@@ -1,0 +1,68 @@
+<svg width="800" height="800" viewBox="0 0 650 740" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .logo-main,
+    .logo-sub {
+      font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+      font-weight: 400;
+      letter-spacing: 0.03em;
+    }
+
+    /* Core color classes – change these to restyle the whole logo */
+    .logo-fill {
+      fill: white;
+    }
+
+    .logo-stroke {
+      stroke: white;
+    }
+  </style>
+
+  <!-- Lightbulb outline -->
+  <path d="M400 20
+           C320 20 250 90 250 170
+           C250 230 290 290 330 320
+           L330 390
+           L470 390
+           L470 320
+           C510 290 550 230 550 170
+           C550 90 480 20 400 20 Z"
+        class="logo-stroke"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        fill="none"
+        stroke-width="25"/>
+
+  <!-- Filled Half-Circle Base Cap (rounded edges) -->
+  <path d="
+    M344 480
+    Q350 465 365 465
+    L436 465
+    Q451 465 457 480
+    A57 57 0 0 1 344 480
+    Z"
+    class="logo-fill"/>
+
+  <!-- Bulb screw base -->
+  <rect x="330" y="410" width="145" height="20" rx="12" class="logo-fill"/>
+  <rect x="330" y="438" width="145" height="20" rx="12" class="logo-fill"/>
+
+  <!-- Crack -->
+  <path d="M495 60
+           L465 100
+           L485 135
+           L445 170
+           L460 200
+           L400 230"
+        class="logo-stroke"
+        stroke-width="20"
+        fill="none"
+        stroke-linecap="round"
+        stroke-linejoin="round"/>
+
+  <!-- Text "2B D" -->
+  <text x="40"   y="510" font-size="256" class="logo-main logo-fill">2B</text>
+  <text x="480" y="510" font-size="256" class="logo-main logo-fill">D</text>
+
+  <!-- Text "IDEAS" -->
+  <text x="40" y="720" font-size="240" class="logo-sub logo-fill">IDEAS</text>
+</svg>
