@@ -19,14 +19,14 @@ export const ComponentBasics = () => {
 
       {/* prettier-ignore */}
       <Text width="90%" gap={{ top: 1, left: 6 }}>
-        • width — (number | percentage) ¶
-        • height — (number | percentage) ¶
-        • border — use a border? ¶
-        • label — show a title in the border ¶
+        • width — number | percentage ¶
+        • height — number | percentage ¶
+        • border — default is false ¶
+        • label — title for the component ¶
         • align — align component's children ¶
         • gap — Spacing within the component ¶
         • background — character to use as fill ¶
-        • hotkey — keyboard shortcut for quick access ¶
+        • hotkey — keyboard shortcut to focus component ¶
         • visible — component visibility ¶
       </Text>
 

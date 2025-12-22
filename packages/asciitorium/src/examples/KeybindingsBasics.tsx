@@ -5,8 +5,7 @@ import {
   Text,
   Keybind,
   State,
-  MobileController,
-} from "../index.js";
+} from '../index.js';
 import { BaseStyle } from './constants.js';
 
 /**
@@ -15,12 +14,15 @@ import { BaseStyle } from './constants.js';
  * Guide to using global keybindings and component hotkeys in asciitorium.
  */
 export const KeybindingsBasics = () => {
-  const message = new State<string>('Press X or Y on either the keyboard or mobile controller');
+  const message = new State<string>(
+    'Press X on the keyboard'
+  );
 
   const setMessage = (msg: string) => {
     message.value = msg;
     setTimeout(() => {
-      message.value = 'Press X or Y on either the keyboard or mobile controller';
+      message.value =
+        'Press X on the keyboard';
     }, 2000);
   };
 
@@ -47,45 +49,21 @@ export const KeybindingsBasics = () => {
     spawnFirework();
   };
 
-  const handleYButton = () => {
-    setMessage('Y pressed - Firework launched!');
-    spawnFirework();
-  };
-
   const container = (
     <Column style={BaseStyle} label="Keybindings & Mobile Basics">
-      <Text width="90%" gap={{ bottom: 2, top: 1 }}>
-        Asciitorium provides global Keybindings for app-level shortcuts in
-        addition to Hotkeys. A virtual Mobile Controller
-        component will show if being displayed on a touch devices
+      <Text width="90%" gap={{ top: 1 }}>
+        Keybindings
       </Text>
-
-      <Text width="90%">Keybindings</Text>
       <Line width="90%" />
 
       <Text width="90%" gap={{ left: 4, bottom: 1 }}>
-        Use the Keybind component to create global keyboard shortcuts that
-        execute custom logic anywhere in your app.
+        The Keybind component creates global single key shortcuts that execute
+        custom logic anywhere in your app.
       </Text>
 
-      <Keybind
-        keyBinding="x"
-        action={handleXButton}
-        description="Launch firework with X"
-      />
-      <Keybind
-        keyBinding="y"
-        action={handleYButton}
-        description="Launch firework with Y"
-      />
-      <MobileController
-        buttons={{
-          x: handleXButton,
-          y: handleYButton,
-        }}
-      />
+      <Keybind keyBinding="x" action={handleXButton} />
 
-      <Column width="90%" align="center" border gap={{ bottom: 2 }}>
+      <Column width="90%" align="center" border gap={{ bottom: 1 }}>
         <Text
           align="center"
           textAlign="center"
@@ -114,24 +92,6 @@ export const KeybindingsBasics = () => {
         visibility is turned off.
       </Text>
 
-      <Text width="90%" align="center" gap={{ top: 1 }}>
-        Mobile Controller
-      </Text>
-      <Line width="90%" />
-      <Text width="90%" gap={{ left: 4, bottom: 1 }}>
-        The MobileController component lets you handle virtual D-pad and button
-        events, making it possible to support touch devices. You
-        can map D-pad directions and buttons (A/B/X/Y/Menu) to any actions in
-        your app, just like with keybindings.
-      </Text>
-      
-      <Text width="90%" gap={{ left: 6 }}>
-        • dpad — up/down/left/right handlers ¶
-        • action buttons — a/b/x/y handlers ¶
-        • menu — Handler for the menu button ¶
-        • enabled — Enable/disable the controller (can be reactive) ¶
-        • priority — which input takes priority if multiple are present
-      </Text>
     </Column>
   );
 

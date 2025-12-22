@@ -48,17 +48,29 @@ export const SwitchBasics = () => {
 
   return (
     <Column style={BaseStyle} label="Switch Basics">
-      <Text width="90%" gap={{ bottom: 1, top: 2 }}>
-        The Switch component provides conditional rendering based on state. It
-        supports two patterns: Case/Default mode and component mode.
+      <Text width="90%" gap={{ top: 1 }}>
+        Switch Component for Conditional Rendering
       </Text>
-
-      <Text width="90%">Case/Default Pattern (Recommended)</Text>
       <Line width="90%" />
-
-      <Text width="90%" gap={{ left: 4, bottom: 1 }}>
-        Use Case and Default with create prop for fresh component instances:
+      <Text width="90%" gap={{ bottom: 1 }}>
+        The Switch component replaces a component based state.
       </Text>
+
+      {/* prettier-ignore */}
+      <Text width="90%" gap={{ left: 6 }}>
+        • condition — State&lt;string&gt; to match against ¶
+        • Case - when [state] then create [component] ¶
+        • Default - if no case statements match, create [component] ¶
+      </Text>
+
+      <Column width="90%" height={12} gap={{ left: 4 }}>
+        <Switch width="100%" height="100%" condition={userRole}>
+          <Case when="admin" create={AdminPanel} />
+          <Case when="user" create={UserPanel} />
+          <Case when="guest" create={GuestPanel} />
+          <Default create={GuestPanel} />
+        </Switch>
+      </Column>
 
       <Row width="100%" align="center" gap={{ left: 4, bottom: 1 }}>
         <Button hotkey="g" onClick={() => (userRole.value = 'guest')}>
@@ -71,29 +83,6 @@ export const SwitchBasics = () => {
           Admin
         </Button>
       </Row>
-
-      <Column width="90%" height={12} gap={{ left: 4 }}>
-        <Switch width="100%" height="100%" condition={userRole}>
-          <Case when="admin" create={AdminPanel} />
-          <Case when="user" create={UserPanel} />
-          <Case when="guest" create={GuestPanel} />
-          <Default create={GuestPanel} />
-        </Switch>
-      </Column>
-
-      <Text width="90%" gap={{ top: 2 }}>
-        Switch Component API
-      </Text>
-      <Line width="90%" />
-
-      {/* prettier-ignore */}
-      <Text width="90%" gap={{ left: 6 }}>
-        • condition — State&lt;string&gt; to match against ¶
-        • Case when — value to match condition against ¶
-        • Case create — component to instantiate (new instance each switch) ¶
-        • Case with — optional props to pass to component ¶
-        • Default create — fallback component when no Case matches ¶
-      </Text>
     </Column>
   );
 };

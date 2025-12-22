@@ -22,12 +22,8 @@ export const StateBasics = () => {
 
   return (
     <Column style={BaseStyle} label="State Basics">
-      <Text width="90%" gap={{ bottom: 2, top: 1 }}>
-        Asciitorium provides reactive state management with State and
-        PersistentState. Components automatically re-render when values change.
-      </Text>
 
-      <Text width="90%">
+      <Text width="90%" gap={{ top: 1 }}>
         State (In-Memory Reactivity)
       </Text>
       <Line width="90%" />
@@ -37,7 +33,7 @@ export const StateBasics = () => {
         Use for temporary values that reset on page reload.
       </Text>
 
-      <Column width="90%" align="center" border gap={{ bottom: 2 }}>
+      <Column width="90%" align="center" gap={{ bottom: 1 }}>
         <TextInput width="90%" hotkey="i" value={textValue} />
         <Text gap={{ top: 1, bottom: 1 }}>
           You typed: {textValue}
@@ -53,8 +49,6 @@ export const StateBasics = () => {
       <Text width="90%" gap={{ left: 6 }}>
         • new State&lt;T&gt;(initialValue) — Create reactive state ¶
         • state.value — Get or set the current values ¶
-        • state.subscribe(callback) — Listen for changes ¶
-        • state.unsubscribe(callback) — Stop listening ¶
       </Text>
 
       <Text width="90%">
@@ -63,13 +57,12 @@ export const StateBasics = () => {
       <Line width="90%" />
 
       <Text width="90%" gap={{ left: 4, bottom: 1 }}>
-        Asciitorium also supports PersistentState which extends State with
+        Asciitorium also supports PersistentState in the browser which extends State with
         automatic localStorage persistence. Values survive page reloads.
       </Text>
 
-      <Text width="90%" gap={{ top: 1 }}>
-        Tip: State changes automatically trigger re-renders. You can also use
-        subscribe() for custom side effects when state changes.
+      <Text width="90%">
+        Tip: You can also use subscribe() for custom side effects when state changes.
       </Text>
     </Column>
   );

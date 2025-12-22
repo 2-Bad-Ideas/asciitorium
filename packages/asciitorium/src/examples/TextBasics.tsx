@@ -9,15 +9,11 @@ import { BaseStyle } from './constants.js';
 export const TextBasics = () => {
   return (
     <Column style={BaseStyle} label="Text Component Basics">
-      <Text width="90%" gap={{ bottom: 1, top: 1 }}>
-        The Text component has a few extra properties than other components that
-        supports text alignment, wrapping, and scrolling.
-      </Text>
-      <Text width="90%">Common Properties</Text>
+      <Text width="90%" gap={{ top: 1 }}>Common Properties</Text>
       <Line width="90%" />
 
       {/* prettier-ignore */}
-      <Text width="90%" gap={{ left: 6 }}>
+      <Text width="90%" gap={{ left: 6 }} typewriter>
         • textAlign — Position text within component (9-point grid) ¶
         • wrap — Enable/disable text wrapping (default: true) ¶
         • scrollable — Enable scrolling for long content (default: false) ¶
@@ -27,37 +23,8 @@ export const TextBasics = () => {
         • \¶ — use \¶ to insert a line break within text ¶
       </Text>
 
-      <Text width="90%">
-        Typewriter Effect
-      </Text>
-      <Line width="90%" />
-
-      <Text width="90%" gap={{ left: 4 }}>
-        Use typewriter=true to create a typewriter effect. Control the speed
-        with typewriterSpeed (characters per second) and the pause after
-        periods with typewriterPauseFactor (multiplier, default 10).
-      </Text>
-
-      <Text
-        width={48}
-        align="center"
-        border
-        typewriter
-        typewriterSpeed={30}
-        typewriterPauseFactor={10}
-        label="Typewriter Effect (30 chars/sec)"
-      >
-        This text appears with a classic typewriter effect. Each character is revealed one at a time. Notice the natural pause after sentences. This can be configured.
-      </Text>
-
       <Text width="90%">Text Alignment</Text>
       <Line width="90%" />
-
-      <Text width="90%" gap={{ left: 4 }}>
-        The textAlign property positions text within the Text component using a
-        9-position grid: top-left, top, top-right, left, center, right,
-        bottom-left, bottom, bottom-right.
-      </Text>
 
       <Row width={15} align="center">
         <Text height={5} width={5} border textAlign="top-left">

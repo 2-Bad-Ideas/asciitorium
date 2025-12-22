@@ -18,37 +18,31 @@ import { BaseStyle } from './constants.js';
  * Guide to keyboard navigation and focus management in asciitorium.
  */
 export const NavigationBasics = () => {
-  const counter = new State<number>(0);
+  const counter = new State<number>(5);
 
   return (
     <Column style={BaseStyle} label="Navigation Basics">
-      <Art gap={{ top: 1, bottom: 1 }} sprite="nav-basics" />
 
-      <Text width="90%" gap={{ bottom: 2 }}>
-        Asciitorium uses [Tab] + [Tab+Shift] for moving between focusable
-        components. Some components can be focused on directly via hotkeys, such
-        as Buttons. Focused components use a {'>'} key to indicate they have
-        focus.
-      </Text>
-
-      <Text width="90%">
+      <Text width="90%" gap={{ top: 1 }}>
         Navigation Keys
       </Text>
       <Line width="90%" />
 
+      <Text width="90%" gap={{ bottom: 1 }}>
+        Asciitorium uses [Tab] + [Tab+Shift] to move between
+        components. Focused components use a '{'>'}' to indicate they have
+        focus.
+      </Text>
+
       {/* prettier-ignore */}
       <Text width="90%" gap={{ left: 6 }}>
-        • Tab — Move focus to next focusable component ¶
-        • Shift+Tab — Move focus to previous component ¶
-        • F1 or ` — Toggle hotkey visibility ¶
-        • Letter keys — Jump to component with matching Hotkey ¶
-        • Enter/Space — Activate focused buttons or toggles ¶
-        • Arrow keys — Component-specific navigation (e.g., Select, Tabs) ¶
+        • Tab — focus on next focusable component ¶
+        • Shift+Tab — focus on previous focusable component ¶
+        • Space — press button ¶
       </Text>
 
       <Text width="90%" gap={{ bottom: 1 }}>
-        Try navigating between these buttons using [Tab], [Shift+Tab] or press
-        [F1] to see their hotkeys:{' '}
+        Try navigating between these two buttons using [Tab], [Shift+Tab]
       </Text>
 
       <Column width="90%" align="center" gap={{ bottom: 1 }}>
@@ -59,23 +53,7 @@ export const NavigationBasics = () => {
           value={counter}
           min={0}
           max={20}
-        />
-        <DotSlider
-          width={50}
-          align="center"
-          gap={{ bottom: 1 }}
-          value={counter}
-          min={0}
-          max={20}
-        />
-
-        <GaugeSlider
-          width={50}
-          align="center"
-          gap={{ bottom: 1 }}
-          value={counter}
-          min={0}
-          max={20}
+          readonly
         />
       </Column>
 

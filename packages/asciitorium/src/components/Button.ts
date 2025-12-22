@@ -271,18 +271,10 @@ export class Button extends Component {
       rightIndicator = ' ';
     }
 
-    // Draw left indicator spanning full height at left edge
+    // Draw left and right indicators at text level
     if (this.hasFocus || this.isPressed) {
-      for (let y = offsetY + padY; y < offsetY + buttonHeight - padY; y++) {
-        drawChar(offsetX + padX, y, leftIndicator);
-      }
-    }
-
-    // Draw right indicator spanning full height at right edge
-    if (this.hasFocus || this.isPressed) {
-      for (let y = offsetY + padY; y < offsetY + buttonHeight - padY; y++) {
-        drawChar(offsetX + buttonWidth - padX - 1, y, rightIndicator);
-      }
+      drawChar(offsetX + padX, labelY, leftIndicator);
+      drawChar(offsetX + buttonWidth - padX - 1, labelY, rightIndicator);
     }
 
     // Draw hotkey indicator at position (1, 0) if border is enabled and hotkey visibility is on
