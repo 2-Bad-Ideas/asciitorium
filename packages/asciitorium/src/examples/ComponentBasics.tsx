@@ -1,4 +1,4 @@
-import { Line, Column, Text } from "../index.js";
+import { Line, Column, Component, Text } from "../index.js";
 import { BaseStyle } from './constants.js';
 
 /**
@@ -9,21 +9,18 @@ import { BaseStyle } from './constants.js';
 export const ComponentBasics = () => {
   return (
     <Column style={BaseStyle} label="Component Basics">
-      <Text width="90%" gap={{ bottom: 1, top: 2 }}>
-        All components extend a base Component class. It provides sizing, rendering, focus handling, and state binding. This
-        allows you to adjust a standard set of properties and behaviors across
-        all components.
-      </Text>
-
-      <Text width="90%">
+      <Text width="90%" gap={{ top: 1 }}>
         Common Component Properties
       </Text>
       <Line width="90%" />
+      <Text width="90%">
+        All components extend the base Component class. It provides a bunch of stuff:
+      </Text>
 
       {/* prettier-ignore */}
-      <Text width="90%" gap={{ left: 6 }}>
-        • width — width of Component ¶
-        • height — height of component ¶
+      <Text width="90%" gap={{ top: 1, left: 6 }}>
+        • width — (number | percentage) ¶
+        • height — (number | percentage) ¶
         • border — use a border? ¶
         • label — show a title in the border ¶
         • align — align component's children ¶
@@ -33,17 +30,14 @@ export const ComponentBasics = () => {
         • visible — component visibility ¶
       </Text>
 
-      <Text
+      <Component
         gap={1}
         width={32}
-        label="Component Example"
         height={5}
+        label="Component"
         align="center"
-        textAlign="center"
         border
-      >
-        Hello World!
-      </Text>
+      />
     </Column>
   );
 };

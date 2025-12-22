@@ -86,7 +86,7 @@ const app = (
   <App align="top-center">
     <Keybind keyBinding="F12" action={togglePerfMonitor} />
 
-    <Banner font="shadows" text="asciitorium" gap={{ bottom: 1 }} />
+    <Banner font="shadows" text="asciitorium" gap={1} />
     <Row height="fill">
       <Column width={28} height="fill">
         {/* Explicit keybindings for Select navigation */}
