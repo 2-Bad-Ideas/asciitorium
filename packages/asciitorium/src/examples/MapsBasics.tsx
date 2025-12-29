@@ -61,7 +61,7 @@ export const MapsBasics = () => {
         representation with legend files that specify gameplay properties.
       </Text>
 
-      <Column width="fill" align="center">
+      <Column width="90%" align="center" gap={{top: 1, bottom: 1}}>
         <MapView
           mapAsset={map}
           player={player}
