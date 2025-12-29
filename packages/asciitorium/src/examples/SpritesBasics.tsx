@@ -1,4 +1,4 @@
-import { Art, Line, Column, Text } from '../index.js';
+import { Art, Line, Column, Text, Row } from '../index.js';
 import { BaseStyle } from './constants.js';
 
 /**
@@ -9,23 +9,18 @@ import { BaseStyle } from './constants.js';
 export const SpritesBasics = () => {
   const container = (
     <Column style={BaseStyle} label="Sprites Basics">
-      <Art sprite="balloon" />
-
-      <Text width="90%">What are Sprites?</Text>
+      <Text width="90%" gap={{ top: 1 }}>
+        Sprites
+      </Text>
       <Line width="90%" />
 
-      <Text width="90%" gap={{ left: 4, bottom: 1 }}>
-        Sprites store ASCII art for characters, creatures, and other game
-        entities. Sprites support multiple frames with configurable timing and
-        can be referenced for dynamic visual representation.
-      </Text>
-
-      <Text width="90%" gap={{ left: 4 }}>
+      <Text width="90%" gap={{ left: 2 }}>
         Sprites are stored in the art/sprites/ directory and can be loaded using
         the Art component or referenced in map legends via the asset property.
       </Text>
+      <Art sprite="beating-heart" />
 
-      <Text width="90%" gap={{ top: 2 }}>
+      <Text width="90%">
         Using Sprites
       </Text>
       <Line width="90%" />
@@ -41,15 +36,12 @@ export const SpritesBasics = () => {
         align="center"
         gap={{ left: 4, top: 1, bottom: 1 }}
       >
-        {`<Art sprite="firework" />`}
+        {`<Art sprite="beating-heart" />`}
       </Text>
 
       <Text width="90%">
-        Sprites automatically cycle through their frames based on the timing
-        configuration in the sprite file. The Art component handles all
-        animation playback automatically. To learn how to create your own
-        sprites, check out the documentation in the public/art/sprites
-        directory.
+        Tip: To learn how to create your own sprites, check out the
+        documentation in the public/art/sprites directory.
       </Text>
     </Column>
   );

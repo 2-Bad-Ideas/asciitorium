@@ -27,11 +27,9 @@ import {
   TextBasics,
   KeybindingsBasics,
   SpritesBasics,
-  FontsBasics,
-  MaterialsBasics,
+  BannerBasics,
   MapsBasics,
   FPVBasics,
-  ArtRaceConditionTest,
 } from './examples/index.js';
 
 // Main state for component selection with persistence
@@ -58,7 +56,7 @@ const docSelect = (
     selected={selectedKey}
   >
     <Option value="start">Getting Started</Option>
-    <OptionGroup label="Component Framework">
+    <OptionGroup label="Components">
       <Option value="components">Component Basics</Option>
       <Option value="text">Text</Option>
       <Option value="layout">Layouts</Option>
@@ -69,15 +67,11 @@ const docSelect = (
       <Option value="lifecycle">Lifecycle & Cleanup</Option>
       <Option value="switch">Switch Component</Option>
     </OptionGroup>
-    <OptionGroup label="ASCII Art & Game Engine">
+    <OptionGroup label="ASCII Art Assets">
       <Option value="sprites">Sprites</Option>
-      <Option value="fonts">Fonts</Option>
-      <Option value="materials">Materials</Option>
+      <Option value="banners">Banners</Option>
       <Option value="maps">Maps</Option>
       <Option value="fpv">First Person View</Option>
-    </OptionGroup>
-    <OptionGroup label="Tests">
-      <Option value="racetest">Art Race Condition</Option>
     </OptionGroup>
   </Select>
 );
@@ -123,11 +117,9 @@ const app = (
         <Case when="lifecycle" create={LifecycleBasics} />
         <Case when="switch" create={SwitchBasics} />
         <Case when="sprites" create={SpritesBasics} />
-        <Case when="fonts" create={FontsBasics} />
-        <Case when="materials" create={MaterialsBasics} />
+        <Case when="banners" create={BannerBasics} />
         <Case when="maps" create={MapsBasics} />
         <Case when="fpv" create={FPVBasics} />
-        <Case when="racetest" create={ArtRaceConditionTest} />
       </Switch>
     </Row>
     <PerfMonitor visible={showPerfMonitor} />

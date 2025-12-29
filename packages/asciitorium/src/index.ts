@@ -37,7 +37,6 @@ export * from './examples/TextBasics.js';
 export * from './examples/KeybindingsBasics.js';
 export * from './examples/NavigationBasics.js';
 export * from './examples/SpritesBasics.js';
-export * from './examples/FontsBasics.js';
-export * from './examples/MaterialsBasics.js';
+export * from './examples/BannerBasics.js';
 export * from './examples/MapsBasics.js';
 export * from './examples/FPVBasics.js';
