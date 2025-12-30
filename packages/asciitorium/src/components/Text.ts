@@ -326,6 +326,11 @@ export class Text extends Component {
   }
 
   draw(): string[][] {
+    if (!this.visible) {
+      // If not visible, return empty buffer
+      return [];
+    }
+
     super.draw(); // fills buffer, draws borders, etc.
 
     const innerWidth = this.width - (this.border ? 2 : 0);
