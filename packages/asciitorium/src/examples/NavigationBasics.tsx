@@ -6,10 +6,11 @@ import {
   Text,
   Button,
   State,
-  ProgressBarSlider,
+  BarSlider,
   DotSlider,
+  ProgressBarSlider,
   GaugeSlider,
-} from "../index.js";
+} from '../index.js';
 import { BaseStyle } from './constants.js';
 
 /**
@@ -22,16 +23,14 @@ export const NavigationBasics = () => {
 
   return (
     <Column style={BaseStyle} label="Navigation Basics">
-
       <Text width="90%" gap={{ top: 1 }}>
         Navigation Keys
       </Text>
       <Line width="90%" />
 
       <Text width="90%" gap={{ bottom: 1 }}>
-        Asciitorium uses [Tab] + [Tab+Shift] to move between
-        components. Focused components use a '{'>'}' to indicate they have
-        focus.
+        Asciitorium uses [Tab] + [Tab+Shift] to move between components. Focused
+        components use a '{'>'}' to indicate they have focus.
       </Text>
 
       {/* prettier-ignore */}
@@ -47,6 +46,33 @@ export const NavigationBasics = () => {
 
       <Column width="90%" align="center" gap={{ bottom: 1 }}>
         <ProgressBarSlider
+          width={50}
+          align="center"
+          gap={{ bottom: 1 }}
+          value={counter}
+          min={0}
+          max={20}
+          readonly
+        />
+        <BarSlider
+          width={50}
+          align="center"
+          gap={{ bottom: 1 }}
+          value={counter}
+          min={0}
+          max={20}
+          readonly
+        />
+        <GaugeSlider
+          width={50}
+          align="center"
+          gap={{ bottom: 1 }}
+          value={counter}
+          min={0}
+          max={20}
+          readonly
+        />
+        <DotSlider
           width={50}
           align="center"
           gap={{ bottom: 1 }}

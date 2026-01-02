@@ -231,6 +231,54 @@ export class DotSlider extends SliderBase {
   }
 }
 
+export class BarSlider extends SliderBase {
+  constructor(options: SliderVariantOptions) {
+    super(options, 'fill', 1);
+  }
+
+  override handleEvent(event: string): boolean {
+    const prevValue = this.valueState.value;
+
+    if (event === 'ArrowRight' || event === 'd') {
+      this.incrementValue();
+    } else if (event === 'ArrowLeft' || event === 'a') {
+      this.decrementValue();
+    } else {
+      return false;
+    }
+
+    return this.valueState.value !== prevValue;
+  }
+
+  override draw(): string[][] {
+    this.initializeBuffer();
+
+    const normalizedValue = this.calculateNormalizedValue();
+    const filledLength = Math.round(normalizedValue * this.width);
+    const y = Math.floor(this.height / 2);
+
+    // Draw filled portion with █
+    for (let x = 0; x < filledLength; x++) {
+      this.drawChar(x, y, '█');
+    }
+
+    // Draw empty portion with ▒
+    for (let x = filledLength; x < this.width; x++) {
+      this.drawChar(x, y, '▒');
+    }
+
+    // Draw hotkey indicator at position (0, 0) if hotkey visibility is on
+    if (this.hotkey && this.isHotkeyVisibilityEnabled()) {
+      const hotkeyDisplay = `[${this.hotkey.toUpperCase()}]`;
+      for (let i = 0; i < hotkeyDisplay.length && i < this.width; i++) {
+        this.drawChar(i, 0, hotkeyDisplay[i]);
+      }
+    }
+
+    return this.buffer;
+  }
+}
+
 export class VerticalSlider extends SliderBase {
   constructor(options: SliderVariantOptions) {
     super(options, 3, 'fill');
