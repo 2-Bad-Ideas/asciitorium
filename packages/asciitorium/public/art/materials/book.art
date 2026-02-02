@@ -1,0 +1,15 @@
+§ {"kind":"material","usage":"first-person","placement":"ground"}
+¶ {"layer":"here","position":"center"}
+     _____ _____
+   ╱╱ ~ ~ Y ~ ~ ╲╲
+  ╱╱ ~~ ~ | ~~ ~ ╲╲
+ ╱╱______.|.______╲╲
+`--------`-ˊ--------ˊ
+¶ {"layer":"near","position":"center"}
+  __ __
+ ╱~~|~~╲
+`--`-ˊ--ˊ
+¶ {"layer":"middle","position":"center"}
+..
+¶ {"layer":"far","position":"center"}
+‥

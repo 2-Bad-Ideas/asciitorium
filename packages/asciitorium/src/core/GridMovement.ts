@@ -1,31 +1,39 @@
-import { AssetManager, type MapAsset, type LegendEntry, type MaterialAsset } from './AssetManager.js';
+import {
+  AssetManager,
+  type MapAsset,
+  type LegendEntry,
+  type MaterialAsset,
+} from './AssetManager.js';
 import { State } from './State.js';
-import type { Direction, Player } from '../components/MapView.js';
+import type { Direction, Position } from '../components/MapView.js';
 import { SoundManager } from './SoundManager.js';
 
 export interface GridMovementOptions {
   mapAsset: State<MapAsset | null>;
-  player: State<Player>;
+  player: State<Position>;
 }
 
 export class GridMovement {
   private mapState: State<MapAsset | null>;
-  private playerState: State<Player>;
+  private playerState: State<Position>;
   private previousPosition: { x: number; y: number } | null = null;
 
   constructor(options: GridMovementOptions) {
     // Use the provided map asset and player state
     this.mapState = options.mapAsset;
     this.playerState = options.player;
-    this.previousPosition = { x: options.player.value.x, y: options.player.value.y };
+    this.previousPosition = {
+      x: options.player.value.x,
+      y: options.player.value.y,
+    };
   }
 
   // Read-only access methods
-  getPlayerState(): State<Player> {
+  getPlayerState(): State<Position> {
     return this.playerState;
   }
 
-  getPlayer(): Player {
+  getPlayer(): Position {
     return this.playerState.value;
   }
 
@@ -139,11 +147,7 @@ export class GridMovement {
     return directions[newIndex];
   }
 
-  private movePlayerBy(
-    dx: number,
-    dy: number,
-    direction: Direction
-  ): boolean {
+  private movePlayerBy(dx: number, dy: number, direction: Direction): boolean {
     const player = this.getPlayer();
     const mapData = this.getMapData();
     const mapHeight = mapData.length;
@@ -170,7 +174,10 @@ export class GridMovement {
 
     // Trigger onExit sound for the old tile before moving
     if (this.previousPosition) {
-      this.checkAndPlayExitSound(this.previousPosition.x, this.previousPosition.y);
+      this.checkAndPlayExitSound(
+        this.previousPosition.x,
+        this.previousPosition.y
+      );
     }
 
     // Move successful

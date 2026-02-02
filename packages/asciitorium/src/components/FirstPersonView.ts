@@ -1,7 +1,7 @@
 import { Component, ComponentProps } from '../core/Component.js';
 import type { State } from '../core/State.js';
 import { requestRender } from '../core/RenderScheduler.js';
-import { Direction, Player, MapData } from './MapView.js';
+import { Direction, Position, MapData } from './MapView.js';
 import { FirstPersonCompositor } from './FirstPersonCompositor.js';
 import type { MapAsset, LegendEntry } from '../core/AssetManager.js';
 
@@ -20,57 +20,117 @@ interface RaycastCube {
 // Predefined raycast cubes for each direction
 const RAYCAST_CUBES: Record<Direction, RaycastCube> = {
   north: {
-    here: { left: { dx: -2, dy: 0 }, center: { dx: 0, dy: 0 }, right: { dx: 2, dy: 0 } },
-    near: { left: { dx: -2, dy: -1 }, center: { dx: 0, dy: -1 }, right: { dx: 2, dy: -1 } },
-    middle: { left: { dx: -2, dy: -2 }, center: { dx: 0, dy: -2 }, right: { dx: 2, dy: -2 } },
-    far: { left: { dx: -2, dy: -3 }, center: { dx: 0, dy: -3 }, right: { dx: 2, dy: -3 } }
+    here: {
+      left: { dx: -2, dy: 0 },
+      center: { dx: 0, dy: 0 },
+      right: { dx: 2, dy: 0 },
+    },
+    near: {
+      left: { dx: -2, dy: -1 },
+      center: { dx: 0, dy: -1 },
+      right: { dx: 2, dy: -1 },
+    },
+    middle: {
+      left: { dx: -2, dy: -2 },
+      center: { dx: 0, dy: -2 },
+      right: { dx: 2, dy: -2 },
+    },
+    far: {
+      left: { dx: -2, dy: -3 },
+      center: { dx: 0, dy: -3 },
+      right: { dx: 2, dy: -3 },
+    },
   },
   south: {
-    here: { left: { dx: 2, dy: 0 }, center: { dx: 0, dy: 0 }, right: { dx: -2, dy: 0 } },
-    near: { left: { dx: 2, dy: 1 }, center: { dx: 0, dy: 1 }, right: { dx: -2, dy: 1 } },
-    middle: { left: { dx: 2, dy: 2 }, center: { dx: 0, dy: 2 }, right: { dx: -2, dy: 2 } },
-    far: { left: { dx: 2, dy: 3 }, center: { dx: 0, dy: 3 }, right: { dx: -2, dy: 3 } }
+    here: {
+      left: { dx: 2, dy: 0 },
+      center: { dx: 0, dy: 0 },
+      right: { dx: -2, dy: 0 },
+    },
+    near: {
+      left: { dx: 2, dy: 1 },
+      center: { dx: 0, dy: 1 },
+      right: { dx: -2, dy: 1 },
+    },
+    middle: {
+      left: { dx: 2, dy: 2 },
+      center: { dx: 0, dy: 2 },
+      right: { dx: -2, dy: 2 },
+    },
+    far: {
+      left: { dx: 2, dy: 3 },
+      center: { dx: 0, dy: 3 },
+      right: { dx: -2, dy: 3 },
+    },
   },
   east: {
-    here: { left: { dx: 0, dy: -1 }, center: { dx: 0, dy: 0 }, right: { dx: 0, dy: 1 } },
-    near: { left: { dx: 2, dy: -1 }, center: { dx: 2, dy: 0 }, right: { dx: 2, dy: 1 } },
-    middle: { left: { dx: 4, dy: -1 }, center: { dx: 4, dy: 0 }, right: { dx: 4, dy: 1 } },
-    far: { left: { dx: 6, dy: -1 }, center: { dx: 6, dy: 0 }, right: { dx: 6, dy: 1 } }
+    here: {
+      left: { dx: 0, dy: -1 },
+      center: { dx: 0, dy: 0 },
+      right: { dx: 0, dy: 1 },
+    },
+    near: {
+      left: { dx: 2, dy: -1 },
+      center: { dx: 2, dy: 0 },
+      right: { dx: 2, dy: 1 },
+    },
+    middle: {
+      left: { dx: 4, dy: -1 },
+      center: { dx: 4, dy: 0 },
+      right: { dx: 4, dy: 1 },
+    },
+    far: {
+      left: { dx: 6, dy: -1 },
+      center: { dx: 6, dy: 0 },
+      right: { dx: 6, dy: 1 },
+    },
   },
   west: {
-    here: { left: { dx: 0, dy: 1 }, center: { dx: 0, dy: 0 }, right: { dx: 0, dy: -1 } },
-    near: { left: { dx: -2, dy: 1 }, center: { dx: -2, dy: 0 }, right: { dx: -2, dy: -1 } },
-    middle: { left: { dx: -4, dy: 1 }, center: { dx: -4, dy: 0 }, right: { dx: -4, dy: -1 } },
-    far: { left: { dx: -6, dy: 1 }, center: { dx: -6, dy: 0 }, right: { dx: -6, dy: -1 } }
-  }
+    here: {
+      left: { dx: 0, dy: 1 },
+      center: { dx: 0, dy: 0 },
+      right: { dx: 0, dy: -1 },
+    },
+    near: {
+      left: { dx: -2, dy: 1 },
+      center: { dx: -2, dy: 0 },
+      right: { dx: -2, dy: -1 },
+    },
+    middle: {
+      left: { dx: -4, dy: 1 },
+      center: { dx: -4, dy: 0 },
+      right: { dx: -4, dy: -1 },
+    },
+    far: {
+      left: { dx: -6, dy: 1 },
+      center: { dx: -6, dy: 0 },
+      right: { dx: -6, dy: -1 },
+    },
+  },
 };
 
-export interface FirstPersonViewOptions extends Omit<ComponentProps, 'children'> {
+export interface FirstPersonViewOptions
+  extends Omit<ComponentProps, 'children'> {
   mapAsset: State<MapAsset | null>;
-  player: State<Player>;
+  player: State<Position>;
   transparency?: boolean; // When true, spaces won't overwrite existing content (useful for debugging)
 }
 
 export class FirstPersonView extends Component {
   focusable = false; // First person view is display-only
   private mapAssetState: State<MapAsset | null>;
-  private playerState: State<Player>;
+  private playerState: State<Position>;
   private compositor: FirstPersonCompositor;
   private transparency: boolean;
   private cachedView: string[][] | null = null;
 
   constructor(options: FirstPersonViewOptions) {
-    const {
-      mapAsset,
-      player,
-      transparency,
-      style,
-      ...componentProps
-    } = options;
+    const { mapAsset, player, transparency, style, ...componentProps } =
+      options;
 
     super({
       ...componentProps,
-      width: 30, // Fixed width for consistent ASCII sprite positioning
+      width: 28, // Fixed width for consistent ASCII sprite positioning
       height: 28, // Fixed height for consistent ASCII sprite positioning
       border: options.border ?? options.style?.border ?? true,
     });
@@ -106,7 +166,7 @@ export class FirstPersonView extends Component {
     return this.mapAsset?.legend ?? {};
   }
 
-  get player(): Player {
+  get player(): Position {
     return this.playerState.value;
   }
 
@@ -139,15 +199,15 @@ export class FirstPersonView extends Component {
   private getDirectionVector(direction: Direction): { dx: number; dy: number } {
     switch (direction) {
       case 'north':
-        return { dx: 0, dy: -1 };   // Move up: decrease Y (go to earlier rows)
+        return { dx: 0, dy: -1 }; // Move up: decrease Y (go to earlier rows)
       case 'south':
-        return { dx: 0, dy: 1 };    // Move down: increase Y (go to later rows)
+        return { dx: 0, dy: 1 }; // Move down: increase Y (go to later rows)
       case 'east':
-        return { dx: 1, dy: 0 };    // Move right: increase X (go to later columns)
+        return { dx: 1, dy: 0 }; // Move right: increase X (go to later columns)
       case 'west':
-        return { dx: -1, dy: 0 };   // Move left: decrease X (go to earlier columns)
+        return { dx: -1, dy: 0 }; // Move left: decrease X (go to earlier columns)
       default:
-        return { dx: 0, dy: -1 };   // Default to north
+        return { dx: 0, dy: -1 }; // Default to north
     }
   }
 
@@ -181,9 +241,6 @@ export class FirstPersonView extends Component {
     }
   }
 
-
-
-
   /**
    * Cast rays using predefined offset cubes to determine what's visible in the first-person view
    *
@@ -196,7 +253,11 @@ export class FirstPersonView extends Component {
   private castRays(): {
     here: { left: string | null; center: string | null; right: string | null };
     near: { left: string | null; center: string | null; right: string | null };
-    middle: { left: string | null; center: string | null; right: string | null };
+    middle: {
+      left: string | null;
+      center: string | null;
+      right: string | null;
+    };
     far: { left: string | null; center: string | null; right: string | null };
   } {
     const mapData = this.mapData;
@@ -217,10 +278,26 @@ export class FirstPersonView extends Component {
 
     // Initialize all positions as null
     const result = {
-      here: { left: null as string | null, center: null as string | null, right: null as string | null },
-      near: { left: null as string | null, center: null as string | null, right: null as string | null },
-      middle: { left: null as string | null, center: null as string | null, right: null as string | null },
-      far: { left: null as string | null, center: null as string | null, right: null as string | null },
+      here: {
+        left: null as string | null,
+        center: null as string | null,
+        right: null as string | null,
+      },
+      near: {
+        left: null as string | null,
+        center: null as string | null,
+        right: null as string | null,
+      },
+      middle: {
+        left: null as string | null,
+        center: null as string | null,
+        right: null as string | null,
+      },
+      far: {
+        left: null as string | null,
+        center: null as string | null,
+        right: null as string | null,
+      },
     };
 
     // Cast rays using predefined offsets from the cube
@@ -231,8 +308,12 @@ export class FirstPersonView extends Component {
         const checkY = player.y + offset.dy;
 
         // Get the character at this position
-        if (checkY >= 0 && checkY < mapData.length &&
-            checkX >= 0 && checkX < mapData[checkY].length) {
+        if (
+          checkY >= 0 &&
+          checkY < mapData.length &&
+          checkX >= 0 &&
+          checkX < mapData[checkY].length
+        ) {
           result[depth][position] = mapData[checkY][checkX];
         } else {
           // Out of bounds - treat as solid wall character (use a default)
@@ -276,7 +357,8 @@ export class FirstPersonView extends Component {
       }
     } else {
       // Start async composition
-      this.compositor.compose(raycast, legend, innerWidth, innerHeight, this.transparency)
+      this.compositor
+        .compose(raycast, legend, innerWidth, innerHeight, this.transparency)
         .then((composedView) => {
           this.cachedView = composedView;
           requestRender(); // Request re-render with the composed view

@@ -11,4 +11,4 @@ export { KeybindingsBasics } from './KeybindingsBasics.js';
 export { SpritesBasics } from './SpritesBasics.js';
 export { BannerBasics } from './BannerBasics.js';
 export { MapsBasics } from './MapsBasics.js';
-export { FPVBasics } from './FPVBasics.js';
+export { GameBasics } from './GameBasics.js';

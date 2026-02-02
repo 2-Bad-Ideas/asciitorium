@@ -8,13 +8,13 @@ import {
   GridMovement,
   AssetManager,
   type MapAsset,
-  type Player,
+  type Position,
 } from '../index.js';
 import { BaseStyle } from './constants.js';
 
 // Initialize state containers
 const map = new State<MapAsset | null>(null);
-const player = new State<Player>({
+const player = new State<Position>({
   x: 15,
   y: 5,
   direction: 'east',
@@ -61,7 +61,7 @@ export const MapsBasics = () => {
         representation with legend files that specify gameplay properties.
       </Text>
 
-      <Column width="90%" align="center" gap={{top: 1, bottom: 1}}>
+      <Column width="90%" align="center" gap={{ top: 1, bottom: 1 }}>
         <MapView
           mapAsset={map}
           player={player}

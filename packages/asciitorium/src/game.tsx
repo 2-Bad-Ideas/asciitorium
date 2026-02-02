@@ -4,7 +4,7 @@ import {
   MapView,
   Row,
   Column,
-  Player,
+  Position,
   Text,
   Keybind,
   AssetManager,
@@ -20,7 +20,7 @@ const tableColumnWidth = 20;
 
 // Initialize state containers
 const map = new State<MapAsset | null>(null);
-const player = new State<Player>({
+const player = new State<Position>({
   x: 2,
   y: 1,
   direction: 'east',

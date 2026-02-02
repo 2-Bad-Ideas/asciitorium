@@ -2,14 +2,11 @@ import { Component, ComponentProps } from '../core/Component.js';
 import type { State } from '../core/State.js';
 import { isState } from '../core/environment.js';
 import { requestRender } from '../core/RenderScheduler.js';
-import {
-  type MapAsset,
-  type LegendEntry,
-} from '../core/AssetManager.js';
+import { type MapAsset, type LegendEntry } from '../core/AssetManager.js';
 
 export type Direction = 'north' | 'south' | 'east' | 'west';
 
-export interface Player {
+export interface Position {
   x: number;
   y: number;
   direction: Direction;
@@ -21,7 +18,7 @@ export interface MapData {
 
 export interface MapViewOptions extends Omit<ComponentProps, 'children'> {
   mapAsset: State<MapAsset | null>;
-  player: State<Player>;
+  player: State<Position>;
   fogOfWar?: boolean | State<boolean>;
   exploredTiles?: Set<string> | State<Set<string>>;
   fogCharacter?: string;
@@ -29,7 +26,7 @@ export interface MapViewOptions extends Omit<ComponentProps, 'children'> {
 
 export class MapView extends Component {
   private mapAssetState: State<MapAsset | null>;
-  private playerState: State<Player>;
+  private playerState: State<Position>;
   private fogOfWarSource: boolean | State<boolean>;
   private exploredTilesSource?: Set<string> | State<Set<string>>;
   private fogCharacter: string;
@@ -81,7 +78,7 @@ export class MapView extends Component {
     return this.mapAsset?.legend ?? {};
   }
 
-  get player(): Player {
+  get player(): Position {
     return this.playerState.value;
   }
 

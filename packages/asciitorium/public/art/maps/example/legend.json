@@ -34,8 +34,15 @@
       "solid": false,
       "showOnMap": false,
       "entity": "item",
-      "variant": "bone",
       "material": "bone"
+    },
+    {
+      "chars": ["B"],
+      "name": "book",
+      "solid": false,
+      "showOnMap": false,
+      "entity": "item",
+      "material": "book"
     }
   ]
 }

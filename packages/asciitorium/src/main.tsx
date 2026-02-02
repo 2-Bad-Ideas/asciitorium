@@ -28,8 +28,7 @@ import {
   KeybindingsBasics,
   SpritesBasics,
   BannerBasics,
-  MapsBasics,
-  FPVBasics,
+  GameBasics,
 } from './examples/index.js';
 
 // Main state for component selection with persistence
@@ -70,14 +69,13 @@ const docSelect = (
     <OptionGroup label="ASCII Art Assets">
       <Option value="sprites">Sprites</Option>
       <Option value="banners">Banners</Option>
-      <Option value="maps">Maps</Option>
-      <Option value="fpv">First Person View</Option>
+      <Option value="game">Game Engine</Option>
     </OptionGroup>
   </Select>
 );
 
 const app = (
-  <App align="top-center">
+  <App align="top-center" font="PrintChar21">
     <Keybind keyBinding="F12" action={togglePerfMonitor} />
 
     <Banner font="shadows" text="asciitorium" gap={1} />
@@ -118,8 +116,7 @@ const app = (
         <Case when="switch" create={SwitchBasics} />
         <Case when="sprites" create={SpritesBasics} />
         <Case when="banners" create={BannerBasics} />
-        <Case when="maps" create={MapsBasics} />
-        <Case when="fpv" create={FPVBasics} />
+        <Case when="game" create={GameBasics} />
       </Switch>
     </Row>
     <PerfMonitor visible={showPerfMonitor} />

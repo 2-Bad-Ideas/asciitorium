@@ -39,4 +39,4 @@ export * from './examples/NavigationBasics.js';
 export * from './examples/SpritesBasics.js';
 export * from './examples/BannerBasics.js';
 export * from './examples/MapsBasics.js';
-export * from './examples/FPVBasics.js';
+export * from './examples/GameBasics.js';
