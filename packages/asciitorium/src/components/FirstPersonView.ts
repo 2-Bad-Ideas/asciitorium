@@ -1,6 +1,5 @@
 import { Component, ComponentProps } from '../core/Component.js';
 import type { State } from '../core/State.js';
-import { isState, loadArt } from '../core/environment.js';
 import { requestRender } from '../core/RenderScheduler.js';
 import { Direction, Player, MapData } from './MapView.js';
 import { FirstPersonCompositor } from './FirstPersonCompositor.js';
@@ -71,7 +70,7 @@ export class FirstPersonView extends Component {
 
     super({
       ...componentProps,
-      width: 28, // Fixed width for consistent ASCII sprite positioning
+      width: 30, // Fixed width for consistent ASCII sprite positioning
       height: 28, // Fixed height for consistent ASCII sprite positioning
       border: options.border ?? options.style?.border ?? true,
     });

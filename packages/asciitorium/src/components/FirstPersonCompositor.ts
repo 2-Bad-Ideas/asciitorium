@@ -22,17 +22,17 @@ type Scene = string;
 
 // Default sprite positions extracted from wireframe.art
 const DEFAULT_SPRITE_POSITIONS: Record<string, number> = {
-  'here-left': -1,
-  'here-right': 19,
-  'near-center': 6,
-  'near-left': -1,
-  'near-right': 16,
-  'middle-center': 9,
-  'middle-left': -1,
-  'middle-right': 14,
-  'far-left': 6,
-  'far-center': 11,
-  'far-right': 14,
+  'here-left': 0,
+  'here-right': 20,
+  'near-center': 7,
+  'near-left': 0,
+  'near-right': 17,
+  'middle-center': 10,
+  'middle-left': 0,
+  'middle-right': 15,
+  'far-left': 7,
+  'far-center': 12,
+  'far-right': 15,
 };
 
 export class FirstPersonCompositor {

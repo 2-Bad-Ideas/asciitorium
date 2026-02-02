@@ -1,17 +1,32 @@
 {
   "legend": [
     {
-      "chars": ["╭", "╮", "╯", "╰", "│", "─", "├", "┤", "┬", "┴", "╷", "╵", "╶", "╴"],
+      "chars": [
+        "╭",
+        "╮",
+        "╯",
+        "╰",
+        "│",
+        "─",
+        "├",
+        "┤",
+        "┬",
+        "┴",
+        "╷",
+        "╵",
+        "╶",
+        "╴"
+      ],
       "name": "wall",
       "solid": true,
-      "material": "wall-brick"
+      "material": "wall-of-stone"
     },
     {
       "chars": ["o"],
       "name": "door",
       "solid": false,
       "entity": "door",
-      "material": "door-wooden"
+      "material": "door-on-stone"
     },
     {
       "chars": ["b"],

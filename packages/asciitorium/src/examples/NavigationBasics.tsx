@@ -1,5 +1,4 @@
 import {
-  Art,
   Line,
   Column,
   Row,

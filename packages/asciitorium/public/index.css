@@ -28,7 +28,7 @@ body {
   font-family:
     'Courier New', 'Courier', 'Menlo', 'Monaco', 'Consolas', monospace;
   font-size: 16px; /* Base font size for character measurement */
-  line-height: 1.1; /* Tight line spacing for ASCII art */
+  line-height: 1; /* Tight line spacing for ASCII art */
 
   /* Center text content horizontally */
   text-align: center;

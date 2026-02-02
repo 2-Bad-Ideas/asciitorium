@@ -7,7 +7,7 @@ import { BaseStyle } from './constants.js';
 export const BannerBasics = () => {
   return (
     <Column style={BaseStyle} label="Banners">
-      <Banner font="pencil" text="pencil" letterSpacing={0} align="center" />
+      <Banner font="pencil" text="QqRrSsTtUuVvWwXxYyZz" letterSpacing={0} align="center" />
       <Banner font="marker" text="marker" letterSpacing={1} align="center" />
       <Banner font="pixel" text="pixel" letterSpacing={1} align="center" />
 

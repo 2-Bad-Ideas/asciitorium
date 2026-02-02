@@ -3,7 +3,6 @@ import type { State } from '../core/State.js';
 import { isState } from '../core/environment.js';
 import { requestRender } from '../core/RenderScheduler.js';
 import {
-  AssetManager,
   type MapAsset,
   type LegendEntry,
 } from '../core/AssetManager.js';
@@ -29,7 +28,6 @@ export interface MapViewOptions extends Omit<ComponentProps, 'children'> {
 }
 
 export class MapView extends Component {
-  focusable = true;
   private mapAssetState: State<MapAsset | null>;
   private playerState: State<Player>;
   private fogOfWarSource: boolean | State<boolean>;
