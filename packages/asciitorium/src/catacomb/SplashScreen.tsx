@@ -58,7 +58,7 @@ export const SplashScreen = ({ onComplete }: SplashScreenProps = {}) => {
   const Title = () => (
     <Column align="center" width={84} height={30}>
       <Art sprite="catacomb" />
-      <Text visible={showTagline}>"When Heros Fall, Legends Rise"</Text>
+      <Text visible={showTagline}>T h e   T o m b   o f   T a h a r a</Text>
     </Column>
   );
 
