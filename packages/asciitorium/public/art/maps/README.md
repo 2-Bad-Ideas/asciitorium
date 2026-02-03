@@ -107,7 +107,7 @@ const gameWorld = new GameWorld({
   initialPosition: { x: 5, y: 5, direction: 'north' }
 });
 
-<MapView gameWorld={gameWorld} fogOfWar={true} />
+<MapView gameWorld={gameWorld} mapMode="explored" />
 <FirstPersonView gameWorld={gameWorld} scene="brick-wall" />
 ```
 

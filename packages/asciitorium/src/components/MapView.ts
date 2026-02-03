@@ -5,6 +5,7 @@ import { requestRender } from '../core/RenderScheduler.js';
 import { type MapAsset, type LegendEntry } from '../core/AssetManager.js';
 
 export type Direction = 'north' | 'south' | 'east' | 'west';
+export type MapMode = 'all' | 'nearby' | 'explored' | 'hidden';
 
 export interface Position {
   x: number;
@@ -19,25 +20,28 @@ export interface MapData {
 export interface MapViewOptions extends Omit<ComponentProps, 'children'> {
   mapAsset: State<MapAsset | null>;
   player: State<Position>;
-  fogOfWar?: boolean | State<boolean>;
-  exploredTiles?: Set<string> | State<Set<string>>;
-  fogCharacter?: string;
+  mapMode?: MapMode | State<MapMode>;
+  mapMemory?: Set<string> | State<Set<string>>;
+  hiddenCharacter?: string;
+  showDirection?: boolean | State<boolean>;
 }
 
 export class MapView extends Component {
   private mapAssetState: State<MapAsset | null>;
   private playerState: State<Position>;
-  private fogOfWarSource: boolean | State<boolean>;
-  private exploredTilesSource?: Set<string> | State<Set<string>>;
-  private fogCharacter: string;
+  private mapModeSource: MapMode | State<MapMode>;
+  private mapMemorySource?: Set<string> | State<Set<string>>;
+  private hiddenCharacter: string;
+  private showDirectionSource: boolean | State<boolean>;
 
   constructor(options: MapViewOptions) {
     const {
       mapAsset,
       player,
-      fogOfWar,
-      exploredTiles,
-      fogCharacter,
+      mapMode,
+      mapMemory,
+      hiddenCharacter,
+      showDirection,
       style,
       ...componentProps
     } = options;
@@ -51,9 +55,10 @@ export class MapView extends Component {
 
     this.mapAssetState = mapAsset;
     this.playerState = player;
-    this.fogOfWarSource = fogOfWar ?? false;
-    this.exploredTilesSource = exploredTiles;
-    this.fogCharacter = fogCharacter ?? ' ';
+    this.mapModeSource = mapMode ?? 'all';
+    this.mapMemorySource = mapMemory;
+    this.hiddenCharacter = hiddenCharacter ?? ' ';
+    this.showDirectionSource = showDirection ?? true;
 
     // Subscribe to player state changes
     this.playerState.subscribe(() => {
@@ -82,19 +87,25 @@ export class MapView extends Component {
     return this.playerState.value;
   }
 
-  get exploredTiles(): Set<string> {
-    if (!this.exploredTilesSource) {
+  get mapMemory(): Set<string> {
+    if (!this.mapMemorySource) {
       return new Set<string>();
     }
-    return isState(this.exploredTilesSource)
-      ? (this.exploredTilesSource as State<Set<string>>).value
-      : (this.exploredTilesSource as Set<string>);
+    return isState(this.mapMemorySource)
+      ? (this.mapMemorySource as State<Set<string>>).value
+      : (this.mapMemorySource as Set<string>);
   }
 
-  get fogOfWar(): boolean {
-    return isState(this.fogOfWarSource)
-      ? (this.fogOfWarSource as State<boolean>).value
-      : (this.fogOfWarSource as boolean);
+  get mapMode(): MapMode {
+    return isState(this.mapModeSource)
+      ? (this.mapModeSource as State<MapMode>).value
+      : (this.mapModeSource as MapMode);
+  }
+
+  get showDirection(): boolean {
+    return isState(this.showDirectionSource)
+      ? (this.showDirectionSource as State<boolean>).value
+      : (this.showDirectionSource as boolean);
   }
 
   private isPositionVisible(
@@ -110,22 +121,22 @@ export class MapView extends Component {
   }
 
   private isPositionExplored(x: number, y: number): boolean {
-    return this.exploredTiles.has(`${x},${y}`);
+    return this.mapMemory.has(`${x},${y}`);
   }
 
   private addExploredPosition(x: number, y: number): void {
     const key = `${x},${y}`;
-    if (this.exploredTilesSource) {
-      if (isState(this.exploredTilesSource)) {
-        const currentSet = (this.exploredTilesSource as State<Set<string>>)
+    if (this.mapMemorySource) {
+      if (isState(this.mapMemorySource)) {
+        const currentSet = (this.mapMemorySource as State<Set<string>>)
           .value;
         if (!currentSet.has(key)) {
           const newSet = new Set(currentSet);
           newSet.add(key);
-          (this.exploredTilesSource as State<Set<string>>).value = newSet;
+          (this.mapMemorySource as State<Set<string>>).value = newSet;
         }
       } else {
-        (this.exploredTilesSource as Set<string>).add(key);
+        (this.mapMemorySource as Set<string>).add(key);
       }
     }
   }
@@ -172,8 +183,8 @@ export class MapView extends Component {
       return this.buffer;
     }
 
-    // If fog of war is enabled, mark visible positions as explored
-    if (this.fogOfWar) {
+    // If map mode is 'nearby' or 'explored', mark visible positions as explored
+    if (this.mapMode === 'nearby' || this.mapMode === 'explored') {
       const visiblePositions = this.getVisiblePositions(player.x, player.y);
       for (const visPos of visiblePositions) {
         if (
@@ -211,8 +222,10 @@ export class MapView extends Component {
 
         // Check if this is the player position
         if (mapX === player.x && mapY === player.y) {
-          // Draw player based on direction
-          const directionChar = this.getDirectionChar(player.direction);
+          // Draw player based on showDirection setting
+          const directionChar = this.showDirection
+            ? this.getDirectionChar(player.direction)
+            : '◈';
           this.buffer[bufferY][bufferX] = directionChar;
         } else {
           // Check legend visibility (defaults to true if not specified)
@@ -225,8 +238,25 @@ export class MapView extends Component {
             }
           }
 
-          // Apply fog of war logic
-          if (this.fogOfWar) {
+          // Apply map mode visibility logic
+          if (this.mapMode === 'hidden') {
+            // Hidden mode: show only hidden character
+            this.buffer[bufferY][bufferX] = this.hiddenCharacter;
+          } else if (this.mapMode === 'nearby') {
+            // Nearby mode: show only visible area
+            const isVisible = this.isPositionVisible(
+              mapX,
+              mapY,
+              player.x,
+              player.y
+            );
+            if (isVisible) {
+              this.buffer[bufferY][bufferX] = displayChar;
+            } else {
+              this.buffer[bufferY][bufferX] = this.hiddenCharacter;
+            }
+          } else if (this.mapMode === 'explored') {
+            // Explored mode: show visible + explored areas
             const isVisible = this.isPositionVisible(
               mapX,
               mapY,
@@ -238,9 +268,10 @@ export class MapView extends Component {
             if (isVisible || isExplored) {
               this.buffer[bufferY][bufferX] = displayChar;
             } else {
-              this.buffer[bufferY][bufferX] = this.fogCharacter;
+              this.buffer[bufferY][bufferX] = this.hiddenCharacter;
             }
           } else {
+            // 'all' mode: show entire map
             this.buffer[bufferY][bufferX] = displayChar;
           }
         }

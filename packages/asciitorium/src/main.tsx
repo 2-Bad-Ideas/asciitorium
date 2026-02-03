@@ -75,7 +75,7 @@ const docSelect = (
 );
 
 const app = (
-  <App align="top-center" font="PrintChar21">
+  <App align="top-center">
     <Keybind keyBinding="F12" action={togglePerfMonitor} />
 
     <Banner font="shadows" text="asciitorium" gap={1} />

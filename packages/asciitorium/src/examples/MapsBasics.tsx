@@ -35,8 +35,8 @@ const gridMovement = new GridMovement({
   player: player,
 });
 
-// Fog of war tracking
-const exploredTiles = new State(new Set<string>());
+// Map memory tracking
+const mapMemory = new State(new Set<string>());
 
 /**
  * Maps Basics
@@ -65,8 +65,8 @@ export const MapsBasics = () => {
         <MapView
           mapAsset={map}
           player={player}
-          fogOfWar={false}
-          exploredTiles={exploredTiles}
+          mapMode="all"
+          mapMemory={mapMemory}
           width="fill"
           height={15}
         />
