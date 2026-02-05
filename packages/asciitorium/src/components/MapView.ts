@@ -221,7 +221,7 @@ export class MapView extends Component {
         if (bufferX >= this.width) break;
 
         // Check if this is the player position
-        if (mapX === player.x && mapY === player.y) {
+        if (mapX === player.x && mapY === player.y && this.mapMode !== 'hidden') {
           // Draw player based on showDirection setting
           const directionChar = this.showDirection
             ? this.getDirectionChar(player.direction)

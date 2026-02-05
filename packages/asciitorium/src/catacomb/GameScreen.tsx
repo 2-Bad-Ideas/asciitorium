@@ -64,7 +64,7 @@ export const GameScreen = ({ onComplete }: MainScreenProps) => {
       <Keybind keyBinding="a" action={() => mapEngine.turnLeft(pc)} />
       <Keybind keyBinding="d" action={() => mapEngine.turnRight(pc)} />
       <Keybind keyBinding="e" action={() => mapEngine.pickupItem(pc)} />
-      <Text label="Stats" width="fill" height={7} border></Text>
+      <Text width="fill" height={7} border></Text>
       <Row align="top-left" height={28}>
         <Column>
           <Column label={pc.name.value} width={28} height={18} border>
@@ -137,7 +137,7 @@ export const GameScreen = ({ onComplete }: MainScreenProps) => {
           ></Column>
         </Column>
       </Row>
-      <Text label="Messages" textAlign="center" width="fill" height={7} border>
+      <Text textAlign="center" width="fill" height={7} border>
         {message}
       </Text>
     </Column>

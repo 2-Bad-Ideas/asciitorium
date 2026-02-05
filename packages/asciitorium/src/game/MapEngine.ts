@@ -107,7 +107,7 @@ export class MapEngine {
     const legendEntry = char ? this.getLegendEntry(char) : undefined;
 
     if (!legendEntry || legendEntry.entity !== 'item') {
-      this.setMessage('Nothing to pick up.');
+      this.setMessage('');
       return false;
     }
 
@@ -120,7 +120,7 @@ export class MapEngine {
 
     this.setCharAt(x, y, ' ');
     SoundManager.playSound('pickup-item.mp3');
-    this.setMessage(`you picked up ${articleFor(name)}${name}.`);
+    this.setMessage(`you picked up ${articleFor(name)}${name}`);
     return true;
   }
 
@@ -204,10 +204,27 @@ export class MapEngine {
     // Update previous position for this entity
     this.previousPositions.set(entity, { x: newX, y: newY });
 
+    // Clear message by default; checkForItem will set one if relevant
+    this.setMessage('');
+
     // Trigger onEnter sound for the new tile
     this.checkAndPlayTileSound(newX, newY);
 
+    // Notify if landing on an item
+    this.checkForItem(newX, newY);
+
     return true;
+  }
+
+  private checkForItem(x: number, y: number): void {
+    const char = this.getCharAt(x, y);
+    if (!char) return;
+
+    const legendEntry = this.getLegendEntry(char);
+    if (!legendEntry || legendEntry.entity !== 'item') return;
+
+    const name = legendEntry.name ?? legendEntry.material;
+    this.setMessage(`you see ${articleFor(name)}${name} here`);
   }
 
   private async checkAndPlayTileSound(x: number, y: number): Promise<void> {
