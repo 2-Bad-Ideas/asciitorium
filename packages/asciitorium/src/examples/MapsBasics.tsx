@@ -5,20 +5,23 @@ import {
   MapView,
   State,
   Keybind,
-  GridMovement,
+  MapEngine,
+  GameEntity,
   AssetManager,
   type MapAsset,
-  type Position,
 } from '../index.js';
 import { BaseStyle } from './constants.js';
 
+const player = new GameEntity({
+  name: 'Player',
+  health: 20,
+  strength: 10,
+  focus: 10,
+  position: { x: 15, y: 5, direction: 'east' },
+});
+
 // Initialize state containers
 const map = new State<MapAsset | null>(null);
-const player = new State<Position>({
-  x: 15,
-  y: 5,
-  direction: 'east',
-});
 
 // Load map asset asynchronously
 AssetManager.getMap('example')
@@ -29,10 +32,9 @@ AssetManager.getMap('example')
     console.error('Failed to load map:', error);
   });
 
-// Create GridMovement controller
-const gridMovement = new GridMovement({
+// Create MapEngine
+const mapEngine = new MapEngine({
   mapAsset: map,
-  player: player,
 });
 
 // Map memory tracking
@@ -46,10 +48,10 @@ const mapMemory = new State(new Set<string>());
 export const MapsBasics = () => {
   return (
     <Column style={BaseStyle} label="Maps Basics">
-      <Keybind keyBinding="w" action={() => gridMovement.moveForward()} />
-      <Keybind keyBinding="s" action={() => gridMovement.moveBackward()} />
-      <Keybind keyBinding="a" action={() => gridMovement.turnLeft()} />
-      <Keybind keyBinding="d" action={() => gridMovement.turnRight()} />
+      <Keybind keyBinding="w" action={() => mapEngine.moveForward(player)} />
+      <Keybind keyBinding="s" action={() => mapEngine.moveBackward(player)} />
+      <Keybind keyBinding="a" action={() => mapEngine.turnLeft(player)} />
+      <Keybind keyBinding="d" action={() => mapEngine.turnRight(player)} />
 
       <Text width="90%" gap={{ top: 1 }}>
         Maps
@@ -64,7 +66,7 @@ export const MapsBasics = () => {
       <Column width="90%" align="center" gap={{ top: 1, bottom: 1 }}>
         <MapView
           mapAsset={map}
-          player={player}
+          player={player.position}
           mapMode="all"
           mapMemory={mapMemory}
           width="fill"

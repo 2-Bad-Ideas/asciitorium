@@ -302,7 +302,7 @@ export class MapView extends Component {
   }
 
   handleEvent(event: string): boolean {
-    // MapView is display-only, movement handled by GridMovement
+    // MapView is display-only, movement handled by MapEngine
     return false;
   }
 }

@@ -10,7 +10,7 @@ import {
   Switch,
   Text,
   Case,
-} from 'asciitorium';
+} from '../index.js';
 
 /**
  * Splash Screen
@@ -58,7 +58,7 @@ export const SplashScreen = ({ onComplete }: SplashScreenProps = {}) => {
   const Title = () => (
     <Column align="center" width={84} height={30}>
       <Art sprite="catacomb" />
-      <Text visible={showTagline}>T h e   T o m b   o f   T a h a r a</Text>
+      <Text visible={showTagline}>T h e T o m b o f T a h a r a</Text>
     </Column>
   );
 
@@ -76,7 +76,7 @@ export const SplashScreen = ({ onComplete }: SplashScreenProps = {}) => {
         the catacombs beneath Tahara were corrupted.¶¶
         
         Now the Veilstone weakens, feeding a spreading rot known as the Withering. 
-        Drawn by fate or desperation, you fall into the catacombs below.¶¶
+        Drawn by fate or some other force, you've stumbled and fell into the catacombs below.¶¶
         Restore the balance… or be consumed by the dark.¶¶
         your story begins now.
       </Text>
@@ -100,14 +100,14 @@ export const SplashScreen = ({ onComplete }: SplashScreenProps = {}) => {
   );
 
   // Play background music when title screen appears
-  SoundManager.playSound('andalusian-reverie.mp3').catch(() => {
+  SoundManager.playSound('andalusian-reverie.mp3', true).catch(() => {
     console.warn('Failed to play title screen music');
   });
 
   // Stop music when component is destroyed (screen changes)
   container.registerCleanup(() => {
     clearTimeout(timer);
-    SoundManager.clearCache();
+    SoundManager.fadeToStop('andalusian-reverie.mp3');
   });
 
   return container;

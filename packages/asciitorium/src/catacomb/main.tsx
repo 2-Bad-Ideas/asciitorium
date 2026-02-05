@@ -1,4 +1,4 @@
-import { App, PerfMonitor, State, Keybind, Switch, Case } from 'asciitorium';
+import { App, PerfMonitor, State, Keybind, Switch, Case } from '../index.js';
 
 import { LandingScreen } from './LandingScreen.js';
 import { SplashScreen } from './SplashScreen.js';

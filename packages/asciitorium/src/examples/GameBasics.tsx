@@ -8,23 +8,26 @@ import {
   ProgressBarSlider,
   State,
   Keybind,
-  GridMovement,
+  MapEngine,
+  GameEntity,
   AssetManager,
   type MapAsset,
-  type Position,
 } from '../index.js';
 import { BaseStyle } from './constants.js';
 
 const health = new State(5);
 const tableColumnWidth = 20;
 
+const player = new GameEntity({
+  name: 'Player',
+  health: 20,
+  strength: 10,
+  focus: 10,
+  position: { x: 2, y: 1, direction: 'east' },
+});
+
 // Initialize state containers
 const map = new State<MapAsset | null>(null);
-const player = new State<Position>({
-  x: 2,
-  y: 1,
-  direction: 'east',
-});
 
 // Load map asset asynchronously
 AssetManager.getMap('example')
@@ -35,10 +38,9 @@ AssetManager.getMap('example')
     console.error('Failed to load map:', error);
   });
 
-// Create GridMovement controller
-const gridMovement = new GridMovement({
+// Create MapEngine
+const mapEngine = new MapEngine({
   mapAsset: map,
-  player: player,
 });
 
 // Map memory tracking
@@ -52,21 +54,21 @@ const mapMemory = new State(new Set<string>());
 export const GameBasics = () => {
   return (
     <Column style={BaseStyle} label="Game Engine Demo">
-      <Keybind keyBinding="w" action={() => gridMovement.moveForward()} />
-      <Keybind keyBinding="s" action={() => gridMovement.moveBackward()} />
-      <Keybind keyBinding="a" action={() => gridMovement.turnLeft()} />
-      <Keybind keyBinding="d" action={() => gridMovement.turnRight()} />
+      <Keybind keyBinding="w" action={() => mapEngine.moveForward(player)} />
+      <Keybind keyBinding="s" action={() => mapEngine.moveBackward(player)} />
+      <Keybind keyBinding="a" action={() => mapEngine.turnLeft(player)} />
+      <Keybind keyBinding="d" action={() => mapEngine.turnRight(player)} />
       <Column align="top" width="fill" height="fill">
         <Row align="top" width="fill" height={28}>
           <FirstPersonView
             align="center"
             gap={{ bottom: 2 }}
             mapAsset={map}
-            player={player}
+            player={player.position}
           />
           <MapView
             mapAsset={map}
-            player={player}
+            player={player.position}
             mapMode="explored"
             mapMemory={mapMemory}
             width={28}

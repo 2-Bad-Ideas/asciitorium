@@ -53,7 +53,7 @@ export class SoundManager {
     }
   }
 
-  static fadeToStop(soundPath: string, durationMs: number = 1000): void {
+  static fadeToStop(soundPath: string, durationMs: number = 3000): void {
     // Only works in web environment
     if (!isWebEnvironment()) {
       return;

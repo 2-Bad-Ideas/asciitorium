@@ -1,4 +1,4 @@
-import { Art, Column, Keybind } from 'asciitorium';
+import { Art, Column, Keybind } from '../index.js';
 
 /**
  * Landing Screen

@@ -6,29 +6,39 @@ import {
   ProgressBarSlider,
   State,
   MapAsset,
-  Position,
   AssetManager,
-  GridMovement,
+  MapEngine,
+  GameEntity,
   FirstPersonView,
   MapView,
-} from 'asciitorium';
+} from '../index.js';
 
 interface MainScreenProps {
   onComplete: () => void;
 }
 
-const health = new State(5);
+const pc = new GameEntity({
+  name: 'Tom Bomberdil',
+  health: 20,
+  maxHealth: 25,
+  strength: 12,
+  focus: 10,
+  position: { x: 2, y: 1, direction: 'east' },
+});
+
+const companion1 = new GameEntity({
+  name: 'Wolf Companion',
+  health: 15,
+  maxHealth: 25,
+  strength: 8,
+  focus: 14,
+});
 
 // Initialize state containers
 const map = new State<MapAsset | null>(null);
-const player = new State<Position>({
-  x: 2,
-  y: 1,
-  direction: 'east',
-});
-const compass = new State<boolean>(false);
-const mapMode = new State<'all' | 'nearby' | 'explored' | 'hidden'>('explored');
+const mapMode = new State<'all' | 'nearby' | 'explored' | 'hidden'>('hidden');
 const mapMemory = new State(new Set<string>());
+const message = new State<string>('');
 
 // Load map asset asynchronously
 AssetManager.getMap('example')
@@ -39,38 +49,37 @@ AssetManager.getMap('example')
     console.error('Failed to load map:', error);
   });
 
-// Create GridMovement controller
-const gridMovement = new GridMovement({
+// Create MapEngine
+const mapEngine = new MapEngine({
   mapAsset: map,
-  player: player,
+  message,
 });
 
-
 export const GameScreen = ({ onComplete }: MainScreenProps) => {
-  const bardHealth = new State(5);
-
+  console.log('help')
   return (
     <Column align="center" width="fill" height="fill">
-      <Keybind keyBinding="w" action={() => gridMovement.moveForward()} />
-      <Keybind keyBinding="s" action={() => gridMovement.moveBackward()} />
-      <Keybind keyBinding="a" action={() => gridMovement.turnLeft()} />
-      <Keybind keyBinding="d" action={() => gridMovement.turnRight()} />
+      <Keybind keyBinding="w" action={() => mapEngine.moveForward(pc)} />
+      <Keybind keyBinding="s" action={() => mapEngine.moveBackward(pc)} />
+      <Keybind keyBinding="a" action={() => mapEngine.turnLeft(pc)} />
+      <Keybind keyBinding="d" action={() => mapEngine.turnRight(pc)} />
+      <Keybind keyBinding="e" action={() => mapEngine.pickupItem(pc)} />
       <Text label="Stats" width="fill" height={7} border></Text>
       <Row align="top-left" height={28}>
         <Column>
-          <Column label="Tom Bomberdil" width={28} height={18} border>
+          <Column label={pc.name.value} width={28} height={18} border>
             <Text gap={{ left: 1, top: 1 }}>Health</Text>
             <ProgressBarSlider
               width={26}
-              value={health}
+              value={pc.health}
               min={0}
-              max={20}
+              max={pc.getMaxHealth()}
               readonly
             />
             <Text gap={{ left: 1, top: 1 }}>Strength</Text>
             <ProgressBarSlider
               width={26}
-              value={health}
+              value={pc.strength}
               min={0}
               max={20}
               readonly
@@ -78,19 +87,19 @@ export const GameScreen = ({ onComplete }: MainScreenProps) => {
             <Text gap={{ left: 1, top: 1 }}>Focus</Text>
             <ProgressBarSlider
               width={26}
-              value={health}
+              value={pc.focus}
               min={0}
               max={20}
               readonly
             />
           </Column>
-          <Column label="Companion 1" width={28} height={10} border>
+          <Column label={companion1.name.value} width={28} height={10} border>
             <Text gap={{ left: 1, top: 1 }}>Health</Text>
             <ProgressBarSlider
               width={26}
-              value={health}
+              value={companion1.health}
               min={0}
-              max={20}
+              max={companion1.getMaxHealth()}
               readonly
             />
             <Text textAlign="center" width="fill" gap={1}>
@@ -103,20 +112,20 @@ export const GameScreen = ({ onComplete }: MainScreenProps) => {
           align="center"
           gap={{ bottom: 2 }}
           mapAsset={map}
-          player={player}
+          player={pc.position}
         />
         <Column>
           <MapView
             label="Map"
             mapAsset={map}
-            player={player}
+            player={pc.position}
             mapMode={mapMode}
             mapMemory={mapMemory}
             width={28}
             height={18}
             background="·"
             hiddenCharacter="·"
-            showDirection={compass}
+            showDirection={pc.hasItemState('compass')}
           />
 
           <Column
@@ -128,7 +137,9 @@ export const GameScreen = ({ onComplete }: MainScreenProps) => {
           ></Column>
         </Column>
       </Row>
-      <Text label="Messages" width="fill" height={7} border></Text>
+      <Text label="Messages" textAlign="center" width="fill" height={7} border>
+        {message}
+      </Text>
     </Column>
   );
 };

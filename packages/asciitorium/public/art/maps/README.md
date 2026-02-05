@@ -67,7 +67,6 @@ Legend files (`legend.json`) map characters to properties and assets:
       "solid": false,
       "showOnMap": false,
       "entity": "item",
-      "variant": "bone",
       "material": "bone"
     }
   ]

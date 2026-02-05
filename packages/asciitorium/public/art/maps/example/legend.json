@@ -40,6 +40,14 @@
       "material": "bone"
     },
     {
+      "chars": ["c"],
+      "name": "compass",
+      "solid": false,
+      "showOnMap": false,
+      "entity": "item",
+      "material": "compass"
+    },
+    {
       "chars": ["B"],
       "name": "book",
       "solid": false,

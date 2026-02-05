@@ -3,38 +3,33 @@ import {
   type MapAsset,
   type LegendEntry,
   type MaterialAsset,
-} from './AssetManager.js';
-import { State } from './State.js';
-import type { Direction, Position } from '../components/MapView.js';
-import { SoundManager } from './SoundManager.js';
+} from '../core/AssetManager.js';
 
-export interface GridMovementOptions {
-  mapAsset: State<MapAsset | null>;
-  player: State<Position>;
+import { State } from '../core/State.js';
+import type { Direction, Position } from '../components/MapView.js';
+import { SoundManager } from '../core/SoundManager.js';
+import { type GameEntity } from './GameEntity.js';
+
+const ALREADY_PLURAL = ['coins', 'grass'];
+
+function articleFor(noun: string): string {
+  if (ALREADY_PLURAL.includes(noun)) return '';
+  return 'aeiou'.includes(noun[0]?.toLowerCase() ?? '') ? 'an ' : 'a ';
 }
 
-export class GridMovement {
+export interface MapEngineOptions {
+  mapAsset: State<MapAsset | null>;
+  message?: State<string>;
+}
+
+export class MapEngine {
   private mapState: State<MapAsset | null>;
-  private playerState: State<Position>;
-  private previousPosition: { x: number; y: number } | null = null;
+  private messageState: State<string> | undefined;
+  private previousPositions = new Map<GameEntity, { x: number; y: number }>();
 
-  constructor(options: GridMovementOptions) {
-    // Use the provided map asset and player state
+  constructor(options: MapEngineOptions) {
     this.mapState = options.mapAsset;
-    this.playerState = options.player;
-    this.previousPosition = {
-      x: options.player.value.x,
-      y: options.player.value.y,
-    };
-  }
-
-  // Read-only access methods
-  getPlayerState(): State<Position> {
-    return this.playerState;
-  }
-
-  getPlayer(): Position {
-    return this.playerState.value;
+    this.messageState = options.message;
   }
 
   getMapState(): State<MapAsset | null> {
@@ -77,36 +72,56 @@ export class GridMovement {
   }
 
   // Movement methods
-  moveForward(): boolean {
-    const player = this.getPlayer();
-    const { dx, dy } = this.getDirectionVector(player.direction);
-    return this.movePlayerBy(dx, dy, player.direction);
+  moveForward(entity: GameEntity): boolean {
+    const pos = entity.position.value;
+    const { dx, dy } = this.getDirectionVector(pos.direction);
+    return this.moveEntity(entity, dx, dy, pos.direction);
   }
 
-  moveBackward(): boolean {
-    const player = this.getPlayer();
-    const oppositeDir = this.getOppositeDirection(player.direction);
+  moveBackward(entity: GameEntity): boolean {
+    const pos = entity.position.value;
+    const oppositeDir = this.getOppositeDirection(pos.direction);
     const { dx, dy } = this.getDirectionVector(oppositeDir);
-    // Move backward but keep facing the same direction
-    return this.movePlayerBy(dx, dy, player.direction);
+    return this.moveEntity(entity, dx, dy, pos.direction);
   }
 
-  turnLeft(): void {
-    const player = this.getPlayer();
-    const newDirection = this.getNewDirection(player.direction, 'left');
-    this.playerState.value = {
-      ...player,
-      direction: newDirection,
+  turnLeft(entity: GameEntity): void {
+    const pos = entity.position.value;
+    entity.position.value = {
+      ...pos,
+      direction: this.getNewDirection(pos.direction, 'left'),
     };
   }
 
-  turnRight(): void {
-    const player = this.getPlayer();
-    const newDirection = this.getNewDirection(player.direction, 'right');
-    this.playerState.value = {
-      ...player,
-      direction: newDirection,
+  turnRight(entity: GameEntity): void {
+    const pos = entity.position.value;
+    entity.position.value = {
+      ...pos,
+      direction: this.getNewDirection(pos.direction, 'right'),
     };
+  }
+
+  pickupItem(entity: GameEntity): boolean {
+    const { x, y } = entity.position.value;
+    const char = this.getCharAt(x, y);
+    const legendEntry = char ? this.getLegendEntry(char) : undefined;
+
+    if (!legendEntry || legendEntry.entity !== 'item') {
+      this.setMessage('Nothing to pick up.');
+      return false;
+    }
+
+    const name = legendEntry.name ?? legendEntry.material;
+
+    entity.addItem({
+      id: legendEntry.material,
+      name,
+    });
+
+    this.setCharAt(x, y, ' ');
+    SoundManager.playSound('pickup-item.mp3');
+    this.setMessage(`you picked up ${articleFor(name)}${name}.`);
+    return true;
   }
 
   // Private helper methods
@@ -147,48 +162,47 @@ export class GridMovement {
     return directions[newIndex];
   }
 
-  private movePlayerBy(dx: number, dy: number, direction: Direction): boolean {
-    const player = this.getPlayer();
+  private moveEntity(
+    entity: GameEntity,
+    dx: number,
+    dy: number,
+    direction: Direction
+  ): boolean {
+    const pos = entity.position.value;
     const mapData = this.getMapData();
     const mapHeight = mapData.length;
     const mapWidth = mapHeight > 0 ? mapData[0].length : 0;
 
     if (mapWidth === 0 || mapHeight === 0) return false;
 
-    const newX = Math.max(0, Math.min(mapWidth - 1, player.x + dx));
-    const newY = Math.max(0, Math.min(mapHeight - 1, player.y + dy));
+    const newX = Math.max(0, Math.min(mapWidth - 1, pos.x + dx));
+    const newY = Math.max(0, Math.min(mapHeight - 1, pos.y + dy));
 
     // Check intermediate positions for horizontal movement (2 steps)
     if (Math.abs(dx) === 2) {
       const stepX = dx > 0 ? 1 : -1;
-      const midX = player.x + stepX;
-      if (this.isSolid(midX, player.y)) {
-        return false; // Blocked
+      const midX = pos.x + stepX;
+      if (this.isSolid(midX, pos.y)) {
+        return false;
       }
     }
 
     // Check final destination
     if (this.isSolid(newX, newY)) {
-      return false; // Blocked
+      return false;
     }
 
     // Trigger onExit sound for the old tile before moving
-    if (this.previousPosition) {
-      this.checkAndPlayExitSound(
-        this.previousPosition.x,
-        this.previousPosition.y
-      );
+    const prev = this.previousPositions.get(entity);
+    if (prev) {
+      this.checkAndPlayExitSound(prev.x, prev.y);
     }
 
     // Move successful
-    this.playerState.value = {
-      x: newX,
-      y: newY,
-      direction,
-    };
+    entity.position.value = { x: newX, y: newY, direction };
 
-    // Update previous position
-    this.previousPosition = { x: newX, y: newY };
+    // Update previous position for this entity
+    this.previousPositions.set(entity, { x: newX, y: newY });
 
     // Trigger onEnter sound for the new tile
     this.checkAndPlayTileSound(newX, newY);
@@ -240,5 +254,24 @@ export class GridMovement {
       // Silently ignore errors loading materials or playing sounds
       console.debug('Could not check exit sound:', error);
     }
+  }
+
+  private setMessage(msg: string): void {
+    if (this.messageState) {
+      this.messageState.value = msg;
+    }
+  }
+
+  private setCharAt(x: number, y: number, char: string): void {
+    const mapAsset = this.mapState.value;
+    if (!mapAsset) return;
+
+    const row = mapAsset.mapData[y];
+    if (!row || x < 0 || x >= row.length) return;
+
+    mapAsset.mapData[y] = row.substring(0, x) + char + row.substring(x + 1);
+
+    // Reassign to trigger reactive update
+    this.mapState.value = { ...mapAsset };
   }
 }
