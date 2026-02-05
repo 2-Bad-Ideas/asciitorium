@@ -72,17 +72,17 @@ export class MapEngine {
   }
 
   // Movement methods
-  moveForward(entity: GameEntity): boolean {
+  moveForward(entity: GameEntity): void {
     const pos = entity.position.value;
     const { dx, dy } = this.getDirectionVector(pos.direction);
-    return this.moveEntity(entity, dx, dy, pos.direction);
+    this.moveEntity(entity, dx, dy, pos.direction);
   }
 
-  moveBackward(entity: GameEntity): boolean {
+  moveBackward(entity: GameEntity): void {
     const pos = entity.position.value;
     const oppositeDir = this.getOppositeDirection(pos.direction);
     const { dx, dy } = this.getDirectionVector(oppositeDir);
-    return this.moveEntity(entity, dx, dy, pos.direction);
+    this.moveEntity(entity, dx, dy, pos.direction);
   }
 
   turnLeft(entity: GameEntity): void {
@@ -162,12 +162,12 @@ export class MapEngine {
     return directions[newIndex];
   }
 
-  private moveEntity(
+  private async moveEntity(
     entity: GameEntity,
     dx: number,
     dy: number,
     direction: Direction
-  ): boolean {
+  ): Promise<boolean> {
     const pos = entity.position.value;
     const mapData = this.getMapData();
     const mapHeight = mapData.length;
@@ -194,8 +194,9 @@ export class MapEngine {
 
     // Trigger onExit sound for the old tile before moving
     const prev = this.previousPositions.get(entity);
+    let soundPlayed = false;
     if (prev) {
-      this.checkAndPlayExitSound(prev.x, prev.y);
+      soundPlayed = await this.checkAndPlayExitSound(prev.x, prev.y);
     }
 
     // Move successful
@@ -208,10 +209,16 @@ export class MapEngine {
     this.setMessage('');
 
     // Trigger onEnter sound for the new tile
-    this.checkAndPlayTileSound(newX, newY);
+    const enterSoundPlayed = await this.checkAndPlayTileSound(newX, newY);
+    soundPlayed = soundPlayed || enterSoundPlayed;
 
     // Notify if landing on an item
     this.checkForItem(newX, newY);
+
+    // Play step sound if no other sound was played
+    if (!soundPlayed) {
+      SoundManager.playSound('step.mp3');
+    }
 
     return true;
   }
@@ -227,12 +234,12 @@ export class MapEngine {
     this.setMessage(`you see ${articleFor(name)}${name} here`);
   }
 
-  private async checkAndPlayTileSound(x: number, y: number): Promise<void> {
+  private async checkAndPlayTileSound(x: number, y: number): Promise<boolean> {
     const char = this.getCharAt(x, y);
-    if (!char) return;
+    if (!char) return false;
 
     const legendEntry = this.getLegendEntry(char);
-    if (!legendEntry) return;
+    if (!legendEntry) return false;
 
     try {
       // Load the material asset to check for sound metadata
@@ -243,19 +250,21 @@ export class MapEngine {
       // Check for onEnterSound in the material asset
       if (materialAsset.onEnterSound) {
         SoundManager.playSound(materialAsset.onEnterSound);
+        return true;
       }
     } catch (error) {
       // Silently ignore errors loading materials or playing sounds
       console.debug('Could not check tile sound:', error);
     }
+    return false;
   }
 
-  private async checkAndPlayExitSound(x: number, y: number): Promise<void> {
+  private async checkAndPlayExitSound(x: number, y: number): Promise<boolean> {
     const char = this.getCharAt(x, y);
-    if (!char) return;
+    if (!char) return false;
 
     const legendEntry = this.getLegendEntry(char);
-    if (!legendEntry) return;
+    if (!legendEntry) return false;
 
     try {
       // Load the material asset to check for sound metadata
@@ -266,11 +275,13 @@ export class MapEngine {
       // Check for onExitSound in the material asset
       if (materialAsset.onExitSound) {
         SoundManager.playSound(materialAsset.onExitSound);
+        return true;
       }
     } catch (error) {
       // Silently ignore errors loading materials or playing sounds
       console.debug('Could not check exit sound:', error);
     }
+    return false;
   }
 
   private setMessage(msg: string): void {
