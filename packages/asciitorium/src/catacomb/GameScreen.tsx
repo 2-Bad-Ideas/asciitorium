@@ -134,6 +134,7 @@ export const GameScreen = ({ onComplete }: MainScreenProps) => {
           align="center"
           gap={{ bottom: 2 }}
           mapAsset={map}
+          renderDistance={'none'}
           player={pc.position}
         />
         <Column>

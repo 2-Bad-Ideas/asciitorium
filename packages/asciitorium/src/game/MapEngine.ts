@@ -183,12 +183,20 @@ export class MapEngine {
       const stepX = dx > 0 ? 1 : -1;
       const midX = pos.x + stepX;
       if (this.isSolid(midX, pos.y)) {
+        const blockingChar = this.getCharAt(midX, pos.y);
+        const blockingEntry = blockingChar ? this.getLegendEntry(blockingChar) : undefined;
+        const blockingName = blockingEntry?.name ?? blockingEntry?.material ?? 'obstacle';
+        this.setMessage(`you are blocked by ${articleFor(blockingName)}${blockingName}`);
         return false;
       }
     }
 
     // Check final destination
     if (this.isSolid(newX, newY)) {
+      const blockingChar = this.getCharAt(newX, newY);
+      const blockingEntry = blockingChar ? this.getLegendEntry(blockingChar) : undefined;
+      const blockingName = blockingEntry?.name ?? blockingEntry?.material ?? 'obstacle';
+      this.setMessage(`you cannot move forward, blocked by ${articleFor(blockingName)}${blockingName}`);
       return false;
     }
 
@@ -231,7 +239,7 @@ export class MapEngine {
     if (!legendEntry || legendEntry.entity !== 'item') return;
 
     const name = legendEntry.name ?? legendEntry.material;
-    this.setMessage(`you see ${articleFor(name)}${name} here`);
+    this.setMessage(`there is ${articleFor(name)}${name} here`);
   }
 
   private async checkAndPlayTileSound(x: number, y: number): Promise<boolean> {

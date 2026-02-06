@@ -4,6 +4,9 @@ import { requestRender } from '../core/RenderScheduler.js';
 import { Direction, Position, MapData } from './MapView.js';
 import { FirstPersonCompositor } from './FirstPersonCompositor.js';
 import type { MapAsset, LegendEntry } from '../core/AssetManager.js';
+import { isState } from '../core/environment.js';
+
+export type RenderDistance = 'none' | 'here' | 'near' | 'middle' | 'far';
 
 interface RaycastOffset {
   dx: number;
@@ -113,6 +116,7 @@ export interface FirstPersonViewOptions
   extends Omit<ComponentProps, 'children'> {
   mapAsset: State<MapAsset | null>;
   player: State<Position>;
+  renderDistance?: RenderDistance | State<RenderDistance>; // Controls how far the player can see (defaults to 'far')
   transparency?: boolean; // When true, spaces won't overwrite existing content (useful for debugging)
 }
 
@@ -120,12 +124,13 @@ export class FirstPersonView extends Component {
   focusable = false; // First person view is display-only
   private mapAssetState: State<MapAsset | null>;
   private playerState: State<Position>;
+  private renderDistanceSource: RenderDistance | State<RenderDistance>;
   private compositor: FirstPersonCompositor;
   private transparency: boolean;
   private cachedView: string[][] | null = null;
 
   constructor(options: FirstPersonViewOptions) {
-    const { mapAsset, player, transparency, style, ...componentProps } =
+    const { mapAsset, player, renderDistance, transparency, style, ...componentProps } =
       options;
 
     super({
@@ -137,6 +142,7 @@ export class FirstPersonView extends Component {
 
     this.mapAssetState = mapAsset;
     this.playerState = player;
+    this.renderDistanceSource = renderDistance ?? 'far';
     this.transparency = transparency ?? false;
 
     this.compositor = new FirstPersonCompositor();
@@ -152,6 +158,14 @@ export class FirstPersonView extends Component {
       this.cachedView = null; // Invalidate cache when map data changes
       requestRender();
     });
+
+    // Subscribe to render distance changes if it's a State
+    if (isState(this.renderDistanceSource)) {
+      this.renderDistanceSource.subscribe(() => {
+        this.cachedView = null; // Invalidate cache when render distance changes
+        requestRender();
+      });
+    }
   }
 
   get mapAsset(): MapAsset | null {
@@ -168,6 +182,12 @@ export class FirstPersonView extends Component {
 
   get player(): Position {
     return this.playerState.value;
+  }
+
+  private get renderDistance(): RenderDistance {
+    return isState(this.renderDistanceSource)
+      ? (this.renderDistanceSource as State<RenderDistance>).value
+      : (this.renderDistanceSource as RenderDistance);
   }
 
   private isSolid(x: number, y: number): boolean {
@@ -262,9 +282,10 @@ export class FirstPersonView extends Component {
   } {
     const mapData = this.mapData;
     const player = this.player;
+    const maxDistance = this.renderDistance;
 
-    // If no map data, return null for all positions
-    if (!mapData || mapData.length === 0) {
+    // If no map data or render distance is 'none', return null for all positions
+    if (!mapData || mapData.length === 0 || maxDistance === 'none') {
       return {
         here: { left: null, center: null, right: null },
         near: { left: null, center: null, right: null },
@@ -272,6 +293,10 @@ export class FirstPersonView extends Component {
         far: { left: null, center: null, right: null },
       };
     }
+
+    // Define depth order
+    const depthOrder: Array<'here' | 'near' | 'middle' | 'far'> = ['here', 'near', 'middle', 'far'];
+    const maxDepthIndex = depthOrder.indexOf(maxDistance);
 
     // Get the raycast cube for the player's current direction
     const cube = RAYCAST_CUBES[player.direction];
@@ -300,8 +325,9 @@ export class FirstPersonView extends Component {
       },
     };
 
-    // Cast rays using predefined offsets from the cube
-    for (const depth of ['here', 'near', 'middle', 'far'] as const) {
+    // Cast rays only up to maxDistance
+    for (let i = 0; i <= maxDepthIndex; i++) {
+      const depth = depthOrder[i];
       for (const position of ['left', 'center', 'right'] as const) {
         const offset = cube[depth][position];
         const checkX = player.x + offset.dx;
