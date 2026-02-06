@@ -39,7 +39,7 @@ const companion1 = new GameEntity({
 const map = new State<MapAsset | null>(null);
 const mapMode = new State<'all' | 'nearby' | 'explored' | 'hidden'>('hidden');
 const mapMemory = new State(new Set<string>());
-const message = new State<string>('');
+const message = new State<string>('It is pitch black. You are likely to be eaten by a grue.');
 
 // Load map asset asynchronously
 AssetManager.getMap('example')
@@ -74,6 +74,24 @@ pc.hasItemState('compass').subscribe(updateCompass);
 
 // Initialize compass sprite
 updateCompass();
+
+// Create render distance state that depends on torch inventory
+const renderDistance = new State<'none' | 'here' | 'near' | 'middle' | 'far'>('none');
+
+// Update render distance based on torch inventory
+const updateRenderDistance = () => {
+  if (pc.hasItemState('torch').value) {
+    renderDistance.value = 'near';
+  } else {
+    renderDistance.value = 'none';
+  }
+};
+
+// Subscribe to torch inventory changes
+pc.hasItemState('torch').subscribe(updateRenderDistance);
+
+// Initialize render distance
+updateRenderDistance();
 
 export const GameScreen = ({ onComplete }: MainScreenProps) => {
   console.log('help')
@@ -134,7 +152,7 @@ export const GameScreen = ({ onComplete }: MainScreenProps) => {
           align="center"
           gap={{ bottom: 2 }}
           mapAsset={map}
-          renderDistance={'none'}
+          renderDistance={renderDistance}
           player={pc.position}
         />
         <Column>

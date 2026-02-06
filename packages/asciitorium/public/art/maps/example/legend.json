@@ -54,6 +54,14 @@
       "showOnMap": false,
       "entity": "item",
       "material": "book"
+    },
+    {
+      "chars": ["t"],
+      "name": "torch",
+      "solid": false,
+      "showOnMap": false,
+      "entity": "item",
+      "material": "torch"
     }
   ]
 }

@@ -1,0 +1,13 @@
+§ {"kind":"material","usage":"first-person","placement":"ground"}
+¶ {"layer":"here","position":"center"}
+          ―――. 
+╭――――――――╱  ╱ ╲
+╰――――――――╲  ╲ ╱ 
+          ―――’
+¶ {"layer":"near","position":"center"}
+⎽⎽⎽⎽╭=╮
+⎺⎺⎺⎺╰=╯
+¶ {"layer":"middle","position":"center"}
+──o
+¶ {"layer":"far","position":"center"}
+‥
