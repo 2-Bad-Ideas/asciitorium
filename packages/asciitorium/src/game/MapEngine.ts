@@ -197,6 +197,8 @@ export class MapEngine {
       const blockingEntry = blockingChar ? this.getLegendEntry(blockingChar) : undefined;
       const blockingName = blockingEntry?.name ?? blockingEntry?.material ?? 'obstacle';
       this.setMessage(`you cannot move forward, blocked by ${articleFor(blockingName)}${blockingName}`);
+      SoundManager.playSound('plop-bonk.mp3');
+
       return false;
     }
 
