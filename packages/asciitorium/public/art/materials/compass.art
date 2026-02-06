@@ -2,11 +2,9 @@
 ¶ {"layer":"here","position":"center"}
     _.---._
   .'   N   '. 
- /     :     \
-|   '. | .'   |
+ /  '. | .'  \
 | W -- o -- E | 
-|   .' | '.   |
- \     :     / 
+ \  .' | '.  /
   '.   S   .' 
     '-._.-'  
 ¶ {"layer":"near","position":"center"}

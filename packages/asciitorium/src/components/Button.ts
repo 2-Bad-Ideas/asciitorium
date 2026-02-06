@@ -1,4 +1,5 @@
 import { Component, ComponentProps } from '../core/Component.js';
+import { State } from '../core/State.js';
 import { requestRender } from '../core/RenderScheduler.js';
 
 /**
@@ -89,7 +90,10 @@ export class Button extends Component {
       }
     }
 
-    const buttonText = actualContent ?? 'Button';
+    // Extract string value if actualContent is a State object
+    const buttonText = actualContent instanceof State
+      ? actualContent.value
+      : (actualContent ?? 'Button');
     const showLabel = false; // Buttons don't show label in border
     const { children, content, ...componentProps } = options;
     super({
@@ -97,7 +101,7 @@ export class Button extends Component {
       width: options.width ?? options.style?.width ?? buttonText.length + 7, // padding + shadow
       height: options.height ?? options.style?.height ?? 4, // height + shadow
       border: options.border ?? options.style?.border ?? true,
-      label: buttonText,
+      label: actualContent, // Pass through State or string - Component handles it
       showLabel,
     });
     this.privateOnClick = onClick;

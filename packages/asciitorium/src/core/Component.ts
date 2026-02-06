@@ -1,5 +1,5 @@
 import { Alignment, SizeValue, SizeContext, ComponentStyle, GapValue, PositionValue } from './types.js';
-import type { State } from './State.js';
+import { State } from './State.js';
 import { LayoutRegistry, LayoutType, LayoutOptions } from './layouts/Layout.js';
 import { resolveGap } from './utils/gapUtils.js';
 import { resolveSize } from './utils/sizeUtils.js';
@@ -16,8 +16,8 @@ const SINGLE_BORDER_CHARS = {
  * Supports both individual style properties and consolidated style objects.
  */
 export interface ComponentProps {
-  /** Optional label displayed at the top of the component */
-  label?: string;
+  /** Optional label displayed at the top of the component (can be a string or State<string> for dynamic updates) */
+  label?: string | State<string>;
 
   /** Optional comment for documentation purposes (not displayed) */
   comment?: string;
@@ -187,8 +187,11 @@ export abstract class Component {
   // Public Properties
   // ========================================================================
 
-  /** Optional label displayed at the top of the component */
+  /** Optional label displayed at the top of the component (internal resolved value) */
   public label: string | undefined;
+
+  /** Optional label State for reactive updates */
+  private labelState?: State<string>;
 
   /** Optional comment for documentation (not rendered) */
   public comment: string | undefined;
@@ -308,7 +311,17 @@ export abstract class Component {
     }
 
     // Initialize basic properties
-    this.label = props.label;
+    // Handle label as either string or State<string>
+    if (props.label instanceof State) {
+      this.labelState = props.label;
+      this.label = props.label.value;
+      // Bind to State changes for reactive label updates
+      this.bind(props.label, (value) => {
+        this.label = value;
+      });
+    } else {
+      this.label = props.label;
+    }
     this.comment = props.comment;
     this.showLabel = props.showLabel ?? true;
     this.border = mergedStyle.border ?? false;

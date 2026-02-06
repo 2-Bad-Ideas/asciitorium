@@ -1,6 +1,7 @@
 import {
   Column,
   Row,
+  Art,
   Keybind,
   Text,
   ProgressBarSlider,
@@ -55,6 +56,25 @@ const mapEngine = new MapEngine({
   message,
 });
 
+// Create a computed state that maps direction to compass sprite
+const compassSprite = new State<string>('compass-unknown');
+
+// Update compass based on both position and inventory
+const updateCompass = () => {
+  if (pc.hasItemState('compass').value) {
+    compassSprite.value = `compass-${pc.position.value.direction}`;
+  } else {
+    compassSprite.value = 'compass-unknown';
+  }
+};
+
+// Subscribe to both position and compass inventory changes
+pc.position.subscribe(updateCompass);
+pc.hasItemState('compass').subscribe(updateCompass);
+
+// Initialize compass sprite
+updateCompass();
+
 export const GameScreen = ({ onComplete }: MainScreenProps) => {
   console.log('help')
   return (
@@ -64,10 +84,12 @@ export const GameScreen = ({ onComplete }: MainScreenProps) => {
       <Keybind keyBinding="a" action={() => mapEngine.turnLeft(pc)} />
       <Keybind keyBinding="d" action={() => mapEngine.turnRight(pc)} />
       <Keybind keyBinding="e" action={() => mapEngine.pickupItem(pc)} />
-      <Text width="fill" height={7} border></Text>
+      <Row width="fill" height={7} align="right" border>
+        <Art sprite={compassSprite} border />
+      </Row>
       <Row align="top-left" height={28}>
         <Column>
-          <Column label={pc.name.value} width={28} height={18} border>
+          <Column label={pc.name} width={28} height={18} border>
             <Text gap={{ left: 1, top: 1 }}>Health</Text>
             <ProgressBarSlider
               width={26}
@@ -93,7 +115,7 @@ export const GameScreen = ({ onComplete }: MainScreenProps) => {
               readonly
             />
           </Column>
-          <Column label={companion1.name.value} width={28} height={10} border>
+          <Column label={companion1.name} width={28} height={10} border>
             <Text gap={{ left: 1, top: 1 }}>Health</Text>
             <ProgressBarSlider
               width={26}

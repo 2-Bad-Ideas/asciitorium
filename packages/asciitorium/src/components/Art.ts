@@ -9,7 +9,7 @@ import {
 
 export interface ArtOptions extends Omit<ComponentProps, 'children'> {
   content?: string | State<string>; // raw text loaded from .art (UTF-8) or reactive state
-  sprite?: string; // sprite name to load from art/sprites/ directory
+  sprite?: string | State<string>; // sprite name to load from art/sprites/ directory or reactive state
   children?: string | string[];
 }
 
@@ -38,16 +38,25 @@ export class Art extends Component {
   private loop = false;
   private timer: ReturnType<typeof setTimeout> | null = null;
   private contentState?: State<string>;
+  private spriteState?: State<string>;
   private isLoading = false;
   private loadError?: string;
-  private sprite?: string;
+  private currentSpriteName?: string;
   private spriteTransparentChar?: string; // sprite-specific transparency character
   private isDestroyed = false; // Track if component has been destroyed
 
   constructor(options: ArtOptions) {
     let actualContent = options.content;
     const borderPadding = options.border ? 2 : 0;
-    const isLoadingSprite = !!options.sprite;
+
+    // Extract sprite name from State if needed
+    let spriteName: string | undefined;
+    if (options.sprite instanceof State) {
+      spriteName = options.sprite.value;
+    } else {
+      spriteName = options.sprite;
+    }
+    const isLoadingSprite = !!spriteName;
 
     // Prepare content and dimensions before super() call
     let parsedFrames: SpriteFrame[] = [];
@@ -121,51 +130,21 @@ export class Art extends Component {
     this.frames = parsedFrames;
     this.loop = parsedLoop;
 
-    if (isLoadingSprite && options.sprite) {
+    if (isLoadingSprite && spriteName) {
       // Set loading state
-      this.sprite = options.sprite;
+      this.currentSpriteName = spriteName;
       this.isLoading = true;
 
       // Start async loading using AssetManager
-      AssetManager.getSprite(options.sprite)
-        .then((spriteAsset) => {
-          if (this.isDestroyed) return;
+      this.loadSprite(spriteName);
 
-          this.isLoading = false;
-          this.loadError = undefined;
-          // Calculate dimensions from sprite frames
-          const { maxW, maxH } = measureFrames(spriteAsset.frames);
-          // Wrap in Asset format for updateContentFromAsset
-          const asset = {
-            kind: 'sprite' as const,
-            width: maxW,
-            height: maxH,
-            data: spriteAsset,
-          };
-          this.updateContentFromAsset(asset);
-          requestRender();
-          this.forceRenderIfNeeded();
-        })
-        .catch((error: Error) => {
-          if (this.isDestroyed) return;
-
-          this.isLoading = false;
-          this.loadError = error.message || 'Failed to load ASCII art';
-          // Don't call updateContent with error text - just set simple error frame
-          const errorText = `Error: ${this.loadError}`;
-          this.frames = [{
-            lines: [[...errorText]],
-            meta: { duration: 0 }
-          }];
-          // Update dimensions to fit error text
-          const borderPadding = this.border ? 2 : 0;
-          this.originalWidth = errorText.length + borderPadding;
-          this.originalHeight = 1 + borderPadding;
-          this.width = errorText.length + borderPadding;
-          this.height = 1 + borderPadding;
-          requestRender();
-          this.forceRenderIfNeeded();
+      // Set up state subscription for reactive sprite
+      if (options.sprite instanceof State) {
+        this.spriteState = options.sprite;
+        this.bind(this.spriteState, (newSpriteName: string) => {
+          this.loadSprite(newSpriteName);
         });
+      }
     } else {
       // Set up state subscription for reactive content
       if (actualContent instanceof State) {
@@ -271,6 +250,61 @@ export class Art extends Component {
 
     // Request a re-render
     requestRender();
+  }
+
+  private loadSprite(spriteName: string): void {
+    if (this.isDestroyed) return;
+
+    // Update current sprite name
+    this.currentSpriteName = spriteName;
+    this.isLoading = true;
+
+    // Load sprite asynchronously
+    AssetManager.getSprite(spriteName)
+      .then((spriteAsset) => {
+        if (this.isDestroyed) return;
+
+        this.isLoading = false;
+        this.loadError = undefined;
+
+        // Calculate dimensions from sprite frames
+        const { maxW, maxH } = measureFrames(spriteAsset.frames);
+
+        // Wrap in Asset format for updateContentFromAsset
+        const asset = {
+          kind: 'sprite' as const,
+          width: maxW,
+          height: maxH,
+          data: spriteAsset,
+        };
+        this.updateContentFromAsset(asset);
+        requestRender();
+        this.forceRenderIfNeeded();
+      })
+      .catch((error: Error) => {
+        if (this.isDestroyed) return;
+
+        this.isLoading = false;
+        this.loadError = error.message || 'Failed to load ASCII art';
+
+        // Set simple error frame
+        const errorText = `Error: ${this.loadError}`;
+        this.frames = [
+          {
+            lines: [[...errorText]],
+            meta: { duration: 0 },
+          },
+        ];
+
+        // Update dimensions to fit error text
+        const borderPadding = this.border ? 2 : 0;
+        this.originalWidth = errorText.length + borderPadding;
+        this.originalHeight = 1 + borderPadding;
+        this.width = errorText.length + borderPadding;
+        this.height = 1 + borderPadding;
+        requestRender();
+        this.forceRenderIfNeeded();
+      });
   }
 
   private updateContentFromAsset(asset: Asset): void {
