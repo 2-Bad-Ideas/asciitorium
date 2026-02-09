@@ -4,7 +4,6 @@ import {
   Art,
   Keybind,
   Text,
-  ProgressBarSlider,
   State,
   MapAsset,
   AssetManager,
@@ -13,6 +12,8 @@ import {
   FirstPersonView,
   MapView,
 } from '../index.js';
+import { CompanionPanel } from './CompanionPanel.js';
+import { CharacterPanel } from './CharacterPanel.js';
 
 interface MainScreenProps {
   onComplete: () => void;
@@ -27,13 +28,37 @@ const pc = new GameEntity({
   position: { x: 2, y: 1, direction: 'east' },
 });
 
-const companion1 = new GameEntity({
+// Add initial companions to PC
+const wolfCompanion = new GameEntity({
   name: 'Wolf Companion',
   health: 15,
   maxHealth: 25,
   strength: 8,
   focus: 14,
 });
+
+const hawkCompanion = new GameEntity({
+  name: 'Hawk Scout',
+  health: 8,
+  maxHealth: 15,
+  strength: 5,
+  focus: 18,
+});
+
+// Add companions with delays to test reactivity
+setTimeout(() => {
+  console.log('Adding Wolf Companion after 5 seconds...');
+  pc.addCompanion(wolfCompanion);
+}, 5000);
+
+setTimeout(() => {
+  console.log('Adding Hawk Scout after 10 seconds...');
+  pc.addCompanion(hawkCompanion);
+}, 10000);
+
+// Get reactive states for each companion slot
+const companion1 = pc.getCompanionState(0);
+const companion2 = pc.getCompanionState(1);
 
 // Initialize state containers
 const map = new State<MapAsset | null>(null);
@@ -107,45 +132,8 @@ export const GameScreen = ({ onComplete }: MainScreenProps) => {
       </Row>
       <Row align="top-left" height={28}>
         <Column>
-          <Column label={pc.name} width={28} height={18} border>
-            <Text gap={{ left: 1, top: 1 }}>Health</Text>
-            <ProgressBarSlider
-              width={26}
-              value={pc.health}
-              min={0}
-              max={pc.getMaxHealth()}
-              readonly
-            />
-            <Text gap={{ left: 1, top: 1 }}>Strength</Text>
-            <ProgressBarSlider
-              width={26}
-              value={pc.strength}
-              min={0}
-              max={20}
-              readonly
-            />
-            <Text gap={{ left: 1, top: 1 }}>Focus</Text>
-            <ProgressBarSlider
-              width={26}
-              value={pc.focus}
-              min={0}
-              max={20}
-              readonly
-            />
-          </Column>
-          <Column label={companion1.name} width={28} height={10} border>
-            <Text gap={{ left: 1, top: 1 }}>Health</Text>
-            <ProgressBarSlider
-              width={26}
-              value={companion1.health}
-              min={0}
-              max={companion1.getMaxHealth()}
-              readonly
-            />
-            <Text textAlign="center" width="fill" gap={1}>
-              (Solid)
-            </Text>
-          </Column>
+          <CharacterPanel character={pc} />
+          <CompanionPanel companionState={companion1} />
         </Column>
         <FirstPersonView
           label="View"
@@ -157,7 +145,6 @@ export const GameScreen = ({ onComplete }: MainScreenProps) => {
         />
         <Column>
           <MapView
-            label="Map"
             mapAsset={map}
             player={pc.position}
             mapMode={mapMode}
@@ -168,14 +155,7 @@ export const GameScreen = ({ onComplete }: MainScreenProps) => {
             hiddenCharacter="·"
             showDirection={pc.hasItemState('compass')}
           />
-
-          <Column
-            width={28}
-            height={10}
-            label="Companion 2"
-            background="."
-            border
-          ></Column>
+          <CompanionPanel companionState={companion2} />
         </Column>
       </Row>
       <Text textAlign="center" width="fill" height={7} border>

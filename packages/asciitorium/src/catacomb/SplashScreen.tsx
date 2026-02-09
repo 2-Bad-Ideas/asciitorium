@@ -58,27 +58,45 @@ export const SplashScreen = ({ onComplete }: SplashScreenProps = {}) => {
   const Title = () => (
     <Column align="center" width={84} height={30}>
       <Art sprite="catacomb" />
-      <Text visible={showTagline}>T h e T o m b o f T a h a r a</Text>
+      {/* prettier-ignore */}
+      <Text visible={showTagline}>T h e   T o m b   o f   T a h a r a</Text>
     </Column>
   );
 
   const Prologue = () => (
     <Column align="center" width="fill" height="fill">
-      <Banner font="marker" letterSpacing={1} text="Prologue" />
+      <Banner font="marker" letterSpacing={1} text="The Descent" />
 
       {/* prettier-ignore */}
       <Text width={60} gap={{top: 2}} textAlign="top-left" height="fill" typewriter>
-        Long ago, Tahara was a land of perfect balance, 
-        sustained by a living relic known as the Veilstone.¶¶
+        For generations, the scavenger tribes have lived with the Withering.
+        Each year, when the land grows weakest, one is chosen to enter in hopes of finding the veilstone. The catacombs do not open. They wait. Someone must enter.
 
-        When an ancient force of chaos shattered that balance, 
-        and guardians who protected it were lost, 
-        the catacombs beneath Tahara were corrupted.¶¶
-        
-        Now the Veilstone weakens, feeding a spreading rot known as the Withering. 
-        Drawn by fate or some other force, you've stumbled and fell into the catacombs below.¶¶
-        Restore the balance… or be consumed by the dark.¶¶
-        your story begins now.
+        No one stands with you now.
+
+        The stone shaft yawns at your feet, older than the tribes, older than the stories. You shoulder your satchel—torch, blade, flute packed tight—and take one last breath of the surface air.
+
+        There is no path down.
+        Only the drop.
+
+        You step forward.
+
+        The satchel tears free as you fall.
+
+        Cold air roars past. Stone scrapes skin. The world turns.
+
+        Then—
+
+        Impact.
+
+        Darkness. Dust. Pain.
+
+        You are alive.
+
+        Somewhere below, something hums.
+
+        The catacombs have accepted you.
+        ¶¶
       </Text>
 
       <Text textAlign="bottom" gap={2}>
