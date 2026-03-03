@@ -65,11 +65,12 @@ export const SplashScreen = ({ onComplete }: SplashScreenProps = {}) => {
 
   const Prologue = () => (
     <Column align="center" width="fill" height="fill">
-      <Banner font="marker" letterSpacing={1} text="The Descent" />
+      <Banner font="marker" letterSpacing={1} text="Prologue" />
 
       {/* prettier-ignore */}
       <Text width={60} gap={{top: 2}} textAlign="top-left" height="fill" typewriter>
-        For generations, the scavenger tribes have lived with the Withering.
+        For hundreds of years the scavenger tribes have lived with the Withering, 
+        a plague that has made the land barren and inhospitable. But Tahara was not always this way. 
         Each year, when the land grows weakest, one is chosen to enter in hopes of finding the veilstone. The catacombs do not open. They wait. Someone must enter.
 
         No one stands with you now.
