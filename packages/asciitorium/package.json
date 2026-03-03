@@ -1,6 +1,6 @@
 {
   "name": "asciitorium",
-  "version": "0.1.52",
+  "version": "0.1.53",
   "private": false,
   "description": "an ASCII CLUI framework",
   "type": "module",
